@@ -3,30 +3,272 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Team tool - coming soon</title>
+  <title>MCL-LRMS - Citizen Portal (DEMO)</title>
+  <meta name="description" content="MCL Land & Revenue Management & Grievance Redressal System - demonstration prototype with sample data.">
+  <link rel="stylesheet" href="style.css">
   <style>
-    body { font-family: Arial, sans-serif; color: #1f2937;
-           max-width: 640px; margin: 40px auto; padding: 0 16px; }
-    .box { border: 2px dashed #c2410c; border-radius: 12px; padding: 20px; }
-    .ok { color: #047857; font-weight: bold; }
-    .warn { color: #b45309; font-weight: bold; }
+    .hero { background: linear-gradient(135deg, #0b3d6b, #135a9c); color: #fff; border-radius: 16px; padding: 22px; margin-bottom: 16px; }
+    .hero h1 { font-size: 1.5rem; }
+    .hero p { opacity: .92; max-width: 820px; }
+    .flow { display: flex; flex-wrap: wrap; gap: 6px; font-size: .85rem; margin-top: 10px; }
+    .flow span { background: rgba(255,255,255,.14); border-radius: 999px; padding: 4px 10px; }
+    .ref-box { font-size: 1.5rem; font-weight: 800; letter-spacing: .04em; background: var(--bg); border: 2px dashed var(--brand-2); border-radius: 10px; padding: 10px 14px; display: inline-block; margin: 6px 0 10px; word-break: break-all; }
+    .notice { border-left: 4px solid var(--brand-2); padding: 4px 12px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>Our team's tool is coming soon</h1>
-    <p>This placeholder page will be replaced in Phase 1 of the workshop.</p>
-    <p id="config-check">Checking database settings...</p>
-  </div>
-  <script src="config.js"></script>
-  <script>
-    var el = document.getElementById("config-check");
-    var url = window.SUPABASE_URL || "";
-    var key = window.SUPABASE_PUBLISHABLE_KEY || "";
-    var ready = url.indexOf("PASTE") === -1 && key.indexOf("sb_publishable_") === 0;
-    el.textContent = ready ? "Database settings: filled in \u2713"
-                           : "Database settings: not filled in yet (this is normal before Phase 1)";
-    el.className = ready ? "ok" : "warn";
-  </script>
+<main>
+  <section class="hero">
+    <h1 data-i18n="hero_title"></h1>
+    <p data-i18n="hero_text"></p>
+    <div class="flow">
+      <span data-i18n="f1"></span><span>→</span><span data-i18n="f2"></span><span>→</span><span data-i18n="f3"></span><span>→</span><span data-i18n="f4"></span><span>→</span><span data-i18n="f5"></span>
+    </div>
+  </section>
+
+  <section class="big-actions" aria-label="Main services">
+    <a class="big-action" href="field.html#find"><div class="ic">🔎</div><div><b data-i18n="b_find"></b><span data-i18n="b_find_s"></span></div></a>
+    <a class="big-action" href="field.html#verify"><div class="ic">📍</div><div><b data-i18n="b_field"></b><span data-i18n="b_field_s"></span></div></a>
+    <a class="big-action" href="#register"><div class="ic">📝</div><div><b data-i18n="b_reg"></b><span data-i18n="b_reg_s"></span></div></a>
+    <a class="big-action" href="#track"><div class="ic">📊</div><div><b data-i18n="b_track"></b><span data-i18n="b_track_s"></span></div></a>
+    <a class="big-action officer" href="dashboard.html"><div class="ic">🏢</div><div><b data-i18n="b_off"></b><span data-i18n="b_off_s"></span></div></a>
+  </section>
+
+  <div id="db-status" style="margin-top:14px"></div>
+
+  <!-- ================= REGISTER GRIEVANCE ================= -->
+  <section class="card" id="register" style="margin-top:16px">
+    <h2>📝 <span data-i18n="b_reg"></span></h2>
+    <p class="muted">Fields marked <b>*</b> are required. This is a demo - please use made-up details only.</p>
+    <form id="grv-form" novalidate>
+      <div class="form-grid">
+        <div><label for="g-name">Applicant name *</label><input id="g-name" maxlength="80" autocomplete="off" required></div>
+        <div><label for="g-mobile">Mobile number * <span class="opt">(10 digits)</span></label><input id="g-mobile" inputmode="numeric" maxlength="10" autocomplete="off" required></div>
+        <div><label for="g-email">Email <span class="opt">(optional)</span></label><input id="g-email" type="email" maxlength="80" autocomplete="off"></div>
+        <div><label for="g-village">Village *</label><select id="g-village" required></select></div>
+        <div><label for="g-khata">Khata number <span class="opt">(optional)</span></label><input id="g-khata" maxlength="20"></div>
+        <div><label for="g-plot">Plot number <span class="opt">(optional)</span></label><input id="g-plot" maxlength="20"></div>
+        <div><label for="g-owner">Landowner / affected person name *</label><input id="g-owner" maxlength="80" required></div>
+        <div><label for="g-cat">Type of grievance *</label><select id="g-cat" required></select></div>
+        <div><label for="g-lang">Preferred communication language</label>
+          <select id="g-lang"><option>English</option><option>Hindi</option><option>Odia</option></select></div>
+      </div>
+      <label for="g-desc">Description of grievance * <span class="opt">(at least 20 characters)</span></label>
+      <textarea id="g-desc" maxlength="2000" required></textarea>
+      <div id="ai-suggest" class="hint"></div>
+      <div class="form-grid">
+        <div><label for="g-doc">Relevant document <span class="opt">(optional, PDF/image)</span></label><input id="g-doc" type="file" accept=".pdf,image/*" multiple></div>
+        <div><label for="g-photo">Photograph <span class="opt">(optional)</span></label><input id="g-photo" type="file" accept="image/*" capture="environment" multiple></div>
+      </div>
+      <p class="hint">Demo note: only the file names are recorded. Secure document storage is part of the production design.</p>
+      <label class="check" style="margin-top:14px"><input type="checkbox" id="g-consent">
+        <span>I declare that the information given is true to the best of my knowledge, and I consent to MCL using it to examine my grievance.</span></label>
+      <div class="btn-row"><button class="btn accent" type="submit" id="g-submit">Submit grievance</button></div>
+    </form>
+    <div id="grv-msg"></div>
+  </section>
+
+  <!-- ================= TRACK GRIEVANCE ================= -->
+  <section class="card" id="track">
+    <h2>📊 <span data-i18n="b_track"></span></h2>
+    <form id="trk-form" class="form-grid" novalidate>
+      <div><label for="t-ref">Grievance reference number</label><input id="t-ref" placeholder="MCL-KA-GRV-2026-000125" autocomplete="off"></div>
+      <div><label for="t-mobile">Registered mobile number</label><input id="t-mobile" inputmode="numeric" maxlength="10" autocomplete="off"></div>
+      <div style="align-self:end"><button class="btn" type="submit" style="width:100%;margin-top:10px">Track status</button></div>
+    </form>
+    <p class="hint">Production: an OTP sent to this mobile number will be required. The demo checks the reference and mobile number only.</p>
+    <div id="trk-msg"></div>
+    <div id="trk-result"></div>
+  </section>
+
+  <!-- ================= INFO ================= -->
+  <section class="grid grid-2">
+    <div class="card" id="about">
+      <h2>About the system</h2>
+      <p>MCL-LRMS brings acquisition records, maps, GIS locations, field verification and grievances into one place, so that acquired plots can be identified faster and every grievance is traceable.</p>
+      <p class="disclaimer">The system is an AI-assisted decision-support tool. It does <b>not</b> declare ownership, decide title, determine lawful possession, approve compensation or R&amp;R, or alter official land records. Final decisions remain with the competent MCL authorities.</p>
+    </div>
+    <div class="card" id="services">
+      <h2>Land-related services</h2>
+      <ul>
+        <li>Register a grievance on acquisition, compensation, R&amp;R, employment/annuity, demarcation, possession or records</li>
+        <li>Track your grievance with the reference number</li>
+        <li>File a representation after disposal (where permitted)</li>
+        <li>See the verification status of a plot on the map</li>
+      </ul>
+    </div>
+    <div class="card" id="notices">
+      <h2>Important notices <span class="muted small">(DEMO)</span></h2>
+      <div class="notice"><b>Sample notice:</b> Joint demarcation camp for Demopur (DEMO), Khata 145 and 121 - date to be announced.</div>
+      <div class="notice"><b>Sample notice:</b> Keep your acquisition award copy and ID ready during field verification.</div>
+      <div class="notice"><b>Sample notice:</b> Grievances can also be handed in at the Land &amp; Revenue office, Kaniha Area (DEMO).</div>
+    </div>
+    <div class="card" id="help">
+      <h2>Contact / help <span class="muted small">(DEMO)</span></h2>
+      <p>Land &amp; Revenue Department, Kaniha Area (sample address)<br>Office hours: 10:00 - 17:00, Monday to Saturday</p>
+      <p>Help desk: <b>DEMO-HELPDESK</b> (sample - not a real number)</p>
+      <p class="small muted">Never share your bank PIN or OTP with anyone. MCL officers will never ask for it.</p>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script src="demo-data.js"></script>
+<script>
+(function () {
+  var L = LRMS, $ = L.$, esc = L.esc;
+  L.addStrings({
+    en: {
+      hero_title: "From acquisition records to identifiable plots - in one platform",
+      hero_text: "Acquisition records, GIS maps, field verification, physical possession tracking and transparent grievance redressal for the Land & Revenue Department, Kaniha Area.",
+      f1: "Records", f2: "Identifiable plots", f3: "Field verification", f4: "Possession tracking", f5: "Grievance redressal",
+      b_find: "Find Acquired Plot", b_find_s: "Village → Khata → Plot on the map",
+      b_field: "Field Verification", b_field_s: "GPS, photos and boundary points (officers)",
+      b_reg: "Register Grievance", b_reg_s: "Get a reference number instantly",
+      b_track: "Track Grievance", b_track_s: "Reference number + mobile number",
+      b_off: "Officer Dashboard", b_off_s: "Authorised MCL officers only"
+    },
+    hi: {
+      hero_title: "अधिग्रहण अभिलेख से पहचान योग्य प्लॉट तक - एक ही प्लेटफ़ॉर्म पर",
+      hero_text: "भूमि एवं राजस्व विभाग, कनिहा क्षेत्र के लिए अधिग्रहण अभिलेख, जीआईएस मानचित्र, क्षेत्र सत्यापन, भौतिक कब्जा ट्रैकिंग और पारदर्शी शिकायत निवारण।",
+      f1: "अभिलेख", f2: "पहचान योग्य प्लॉट", f3: "क्षेत्र सत्यापन", f4: "कब्जा ट्रैकिंग", f5: "शिकायत निवारण",
+      b_find: "अधिग्रहित प्लॉट खोजें", b_find_s: "गाँव → खाता → प्लॉट मानचित्र पर",
+      b_field: "क्षेत्र सत्यापन", b_field_s: "जीपीएस, फोटो और सीमा बिंदु (अधिकारी)",
+      b_reg: "शिकायत दर्ज करें", b_reg_s: "तुरंत संदर्भ संख्या प्राप्त करें",
+      b_track: "शिकायत की स्थिति देखें", b_track_s: "संदर्भ संख्या + मोबाइल नंबर",
+      b_off: "अधिकारी डैशबोर्ड", b_off_s: "केवल अधिकृत एमसीएल अधिकारी"
+    }
+  });
+  L.renderHeader("home");
+
+  if (!L.db) L.showMsg("#db-status", "warn", "The database is not connected yet, so grievances cannot be saved or tracked. The map and plot search still work with demo data.", L.dbError);
+
+  // Fill dropdowns
+  var vSel = $("#g-village");
+  vSel.innerHTML = "<option value=''>- Select village -</option>" + DEMO.villages.map(function (v) {
+    return "<option>" + esc(v.name) + "</option>"; }).join("") + "<option>Other village (DEMO)</option>";
+  $("#g-cat").innerHTML = "<option value=''>- Select type -</option>" + L.CATEGORIES.map(function (c) {
+    return "<option>" + esc(c) + "</option>"; }).join("");
+
+  // AI suggestion of category while typing (suggestion only - citizen decides)
+  var desc = $("#g-desc"), suggestion = null;
+  desc.addEventListener("input", function () {
+    var s = L.suggestCategory(desc.value); suggestion = s;
+    if (desc.value.length < 15 || !s.category) { $("#ai-suggest").innerHTML = ""; return; }
+    $("#ai-suggest").innerHTML = "<span class='ai-tag'>AI SUGGESTION</span> This looks like <b>" + esc(s.category) +
+      "</b>. <button type='button' class='btn small secondary' id='use-sugg'>Use this type</button>";
+    $("#use-sugg").onclick = function () { $("#g-cat").value = s.category; };
+  });
+
+  function fileNames(input) {
+    return Array.prototype.map.call(input.files || [], function (f) { return { name: f.name, size: f.size, type: f.type }; });
+  }
+
+  // ---------- Register ----------
+  $("#grv-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var msg = $("#grv-msg"), g = {
+      name: $("#g-name").value.trim(), mobile: $("#g-mobile").value.replace(/\D/g, ""), email: $("#g-email").value.trim(),
+      village: vSel.value, khata: $("#g-khata").value.trim(), plot: $("#g-plot").value.trim(), owner: $("#g-owner").value.trim(),
+      cat: $("#g-cat").value, desc: desc.value.trim(), lang: $("#g-lang").value
+    };
+    var problems = [];
+    if (!g.name) problems.push("applicant name");
+    if (!/^[6-9]\d{9}$/.test(g.mobile)) problems.push("a valid 10-digit mobile number");
+    if (g.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(g.email)) problems.push("a valid email (or leave it empty)");
+    if (!g.village) problems.push("village");
+    if (!g.owner) problems.push("landowner / affected person name");
+    if (!g.cat) problems.push("type of grievance");
+    if (g.desc.length < 20) problems.push("a description of at least 20 characters");
+    if (!$("#g-consent").checked) problems.push("the declaration tick-box");
+    if (problems.length) { L.showMsg(msg, "err", "Please fill in: " + problems.join(", ") + "."); return; }
+    if (!L.dbReady(msg)) return;
+
+    var match = DEMO.plots.filter(function (p) {
+      return p.village === g.village && L.norm(p.khata) === L.norm(g.khata) && L.normPlot(p.plot) === L.normPlot(g.plot);
+    })[0];
+    var ai = L.suggestCategory(g.desc);
+    var btn = $("#g-submit"); btn.disabled = true; btn.textContent = "Submitting...";
+    L.db.from(L.APP.table).insert({
+      record_type: "Grievance", location: g.village, urgency: ai.urgency, status: "Open",
+      khata_no: g.khata || null, plot_no: g.plot || null, plot_id: match ? match.id : null, updated_by: "Citizen",
+      applicant_name: g.name, mobile: g.mobile, email: g.email || null, landowner_name: g.owner, category: g.cat,
+      description: g.desc, language: g.lang, consent: true,
+      attachments: fileNames($("#g-doc")).map(function (f) { f.kind = "Document"; return f; })
+        .concat(fileNames($("#g-photo")).map(function (f) { f.kind = "Photograph"; return f; }))
+    }).select("ref_no, created_at").single().then(function (r) {
+      btn.disabled = false; btn.textContent = "Submit grievance";
+      if (r.error) { L.showMsg(msg, "err", "Sorry, the grievance could not be saved. Please try again.", r.error); return; }
+      $("#grv-form").reset(); $("#ai-suggest").innerHTML = "";
+      msg.innerHTML = "<div class='msg ok' role='status'><h3>✅ Your grievance has been successfully registered.</h3>" +
+        "Your grievance reference number:<br><span class='ref-box'>" + esc(r.data.ref_no) + "</span><br>" +
+        "Registered on " + esc(L.fmtDateTime(r.data.created_at)) + ". Please note down this number to track your grievance." +
+        "<h3 style='margin-top:12px'>What happens next</h3><ol class='small'>" +
+        L.STAGES.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ol>" +
+        "<p class='small'>No disposal date is promised because no official time limit (SLA) is configured in this demo. " +
+        "Acknowledgement by SMS/email will be sent once an authorised messaging service is connected.</p>" +
+        "<button class='btn small' id='go-track'>Track this grievance</button></div>";
+      $("#go-track").onclick = function () {
+        $("#t-ref").value = r.data.ref_no; $("#t-mobile").value = g.mobile; $("#track").scrollIntoView({ behavior: "smooth" });
+      };
+      msg.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  // ---------- Track ----------
+  function stepper(stage) {
+    var idx = L.STAGES.indexOf(stage);
+    return "<ol class='stepper'>" + L.STAGES.map(function (s, i) {
+      return "<li class='" + (i < idx ? "done" : i === idx ? (stage === "Disposed" ? "done current" : "current") : "") + "'>" + esc(s) + "</li>";
+    }).join("") + "</ol>";
+  }
+  function track(ref, mobile) {
+    var msg = $("#trk-msg"), out = $("#trk-result"); out.innerHTML = ""; msg.innerHTML = "";
+    if (!ref || !/^\d{10}$/.test(mobile)) { L.showMsg(msg, "err", "Please enter the reference number and the 10-digit mobile number used at registration."); return; }
+    if (!L.dbReady(msg)) return;
+    L.showMsg(msg, "info", "Searching...");
+    L.db.rpc("track_grievance", { p_ref: ref, p_mobile: mobile }).then(function (r) {
+      if (r.error) { L.showMsg(msg, "err", "Sorry, tracking failed.", r.error); return; }
+      var g = (r.data || [])[0];
+      if (!g) { L.showMsg(msg, "warn", "No grievance found for this reference number and mobile number. Please check both and try again."); return; }
+      msg.innerHTML = "";
+      out.innerHTML = "<div class='grid grid-2'><div><dl class='kv'>" +
+        "<dt>Reference number</dt><dd><b>" + esc(g.ref_no) + "</b></dd>" +
+        "<dt>Date of registration</dt><dd>" + esc(L.fmtDate(g.created_at)) + "</dd>" +
+        "<dt>Grievance category</dt><dd>" + esc(g.category) + "</dd>" +
+        "<dt>Village</dt><dd>" + esc(g.location) + "</dd>" +
+        "<dt>Current status</dt><dd>" + L.stagePill(g.stage) + "</dd>" +
+        "<dt>Assigned to</dt><dd>" + esc(g.assigned_to || "Not yet assigned") + "</dd>" +
+        "<dt>Last action taken</dt><dd>" + esc(g.last_action || "-") + "</dd>" +
+        "<dt>Remarks</dt><dd>" + esc(g.public_remarks || "-") + "</dd>" +
+        "<dt>Latest update</dt><dd>" + esc(L.fmtDateTime(g.updated_at)) + "</dd>" +
+        "<dt>Disposal status</dt><dd><b>" + (g.stage === "Disposed" ? "Disposed" : "Pending") + "</b></dd>" +
+        "</dl></div><div><h3>Progress</h3>" + stepper(g.stage) + "</div></div>" +
+        (g.stage === "Disposed" ? "<div class='card' style='margin-top:12px'><h3>Not satisfied? File a representation</h3>" +
+          "<p class='small muted'>Where the grievance procedure permits, a representation reopens the grievance for scrutiny.</p>" +
+          "<label for='rep-text'>Your representation</label><textarea id='rep-text' maxlength='1000'></textarea>" +
+          "<div class='btn-row'><button class='btn secondary' id='rep-btn'>Submit representation</button></div><div id='rep-msg'></div></div>" : "");
+      var rb = $("#rep-btn");
+      if (rb) rb.onclick = function () {
+        var txt = $("#rep-text").value.trim();
+        if (txt.length < 10) { L.showMsg("#rep-msg", "err", "Please write at least 10 characters."); return; }
+        rb.disabled = true;
+        L.db.rpc("submit_representation", { p_ref: ref, p_mobile: mobile, p_text: txt }).then(function (x) {
+          rb.disabled = false;
+          if (x.error) { L.showMsg("#rep-msg", "err", "Sorry, the representation could not be saved.", x.error); return; }
+          track(ref, mobile);
+          L.showMsg(msg, "ok", "Representation received. Your grievance has been reopened for scrutiny.");
+        });
+      };
+    });
+  }
+  $("#trk-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    track($("#t-ref").value.trim(), $("#t-mobile").value.replace(/\D/g, ""));
+  });
+})();
+</script>
 </body>
 </html>

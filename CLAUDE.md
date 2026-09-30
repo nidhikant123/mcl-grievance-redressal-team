@@ -71,13 +71,47 @@
   commit and push.
 
 ## Our tool (filled in during Phase 1)
-- Team:
-- Tool name:
-- Problem:
-- Who records / who decides:
-- Table name and columns:
-- Pages: index.html = entry page; dashboard.html = dashboard
+- Team: MCL Land & Revenue Department, Kaniha Area (IIM Sambalpur MDP team)
+- Tool name: MCL Land & Revenue Management & Grievance Redressal System (MCL-LRMS)
+- Problem: Acquired land (compensation and R&R done) is hard to locate and
+  demarcate on the ground because old maps and records are unclear. This delays
+  physical possession and the disposal of land grievances.
+- Who records / who decides: Citizens register grievances; field officers record
+  GPS verification; Land & Revenue / Grievance officers decide. The tool only
+  supports decisions - it never decides ownership, title or possession.
+- Table name and columns: lrms_records (one table, see database/01-setup.sql).
+  record_type = 'Grievance' or 'Plot update'; location (village), urgency,
+  status, khata_no, plot_no, plot_id, ref_no, stage, applicant fields,
+  category, description, assigned_to, public_remarks, internal_notes, disposal,
+  plot_status, details (GPS, points, photos, AI fields), history (audit trail).
+- Pages: index.html = citizen portal (register + track grievance);
+  dashboard.html = officer dashboard; field.html = find plot, GIS map,
+  AI document analysis, field verification.
+- Other files: style.css, common.js (shared code), demo-data.js (fictional
+  plots), docs/ARCHITECTURE.md (full production design), docs/DEMO-SCRIPT.md.
 
 ## Progress Log (newest entry at the bottom)
 - Phase 0 (starter): placeholder index.html, config.js without settings and
   this CLAUDE.md. Next: Phase 1 - the table and the entry page.
+- Phase 1 (builder: Claude, 30 Sep 2026): full demo prototype of MCL-LRMS.
+  Built: database/01-setup.sql (one table lrms_records, reference numbers made
+  by the database, append-only audit trail, safe track_grievance() and
+  submit_representation() functions); citizen portal (register with AI
+  category suggestion, track with progress steps, representation after
+  disposal, English/Hindi toggle); officer dashboard (demo role sign-in, KPI
+  cards, charts, filters, universal search, notifications, assign / field
+  verification / documents / notes / response / action taken / dispose with
+  confirmation, disposal report, 6 reports as PDF or Excel, audit trail, role
+  matrix); field page (Village -> Khata -> Plot search, Leaflet map with
+  satellite and layers, measuring, GPS, AI OCR with Tesseract.js, sample
+  old-map boundary detection with confidence, discrepancy flags, field
+  verification with GPS points -> polygon and geo-stamped photos, status
+  change with mandatory remarks).
+  Works: the full 19-step demo flow was tested in a browser against a pretend
+  database. NOT yet tested against our real Supabase.
+  Known problems: officer sign-in is a DEMO role picker (no real security) and
+  the table is readable with the public key - fine only because all data is
+  fictional. Map boundaries are synthetic. Map-boundary AI for the sample map
+  is simulated. Only file names are stored for uploads.
+  Next step: Data Keeper runs database/01-setup.sql, fill in config.js, then
+  test the live site using docs/DEMO-SCRIPT.md.

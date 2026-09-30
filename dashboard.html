@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MCL-LRMS - Officer Dashboard (DEMO)</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .toolbar { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
+    .filters { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+    .filters label { font-size: .85rem; margin: 0 0 2px; }
+    .filters input, .filters select { min-height: 42px; padding: 6px 8px; }
+    .badge { background: var(--err); color: #fff; border-radius: 999px; padding: 0 8px; font-size: .8rem; margin-left: 4px; }
+    .notif { border-left: 4px solid var(--brand-2); padding: 6px 10px; margin-bottom: 8px; background: var(--bg); border-radius: 0 8px 8px 0; cursor: pointer; }
+    .action-box { border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-top: 10px; }
+    .action-box summary { font-weight: 600; cursor: pointer; min-height: 32px; }
+    .rep-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .rep-row b { flex: 1 1 240px; }
+    .signin { max-width: 560px; margin: 20px auto; }
+  </style>
+</head>
+<body>
+<main>
+  <div id="page-msg"></div>
+
+  <!-- ================= SIGN IN (DEMO) ================= -->
+  <section id="signin" class="card signin hidden">
+    <h1>🏢 Officer Dashboard</h1>
+    <p>For authorised MCL officers only.</p>
+    <div class="msg warn"><b>Demo sign-in - not real security.</b> This prototype has no login server, so you pick a demo officer role below.
+      The production system uses <b>Officer ID → individual PIN (stored hashed, lock-out after repeated failures) → OTP</b> on a secure backend.
+      No PIN or password is stored in this website's code.</div>
+    <label for="si-officer">Demo officer</label>
+    <select id="si-officer"></select>
+    <div class="btn-row"><button class="btn accent" id="si-btn" style="flex:1">Sign in (demo)</button></div>
+  </section>
+
+  <!-- ================= DASHBOARD ================= -->
+  <section id="dash" class="hidden">
+    <div class="toolbar">
+      <div><label for="u-search">🔍 Universal search <span class="opt">(reference no., village, khata, plot, name, notification)</span></label>
+        <input id="u-search" placeholder="e.g. 000125, 145/234, Demopur, DEMO/LA" autocomplete="off"></div>
+      <button class="btn secondary" id="notif-btn">🔔 Notifications <span class="badge" id="notif-count">0</span></button>
+    </div>
+    <div id="u-results"></div>
+    <div id="notif-panel" class="card hidden" style="margin-top:10px"></div>
+
+    <details class="card" style="margin-top:12px" open>
+      <summary><b>Filters</b></summary>
+      <div class="filters" style="margin-top:8px">
+        <div><label for="fl-village">Village</label><select id="fl-village"></select></div>
+        <div><label for="fl-khata">Khata No.</label><input id="fl-khata"></div>
+        <div><label for="fl-plot">Plot No.</label><input id="fl-plot"></div>
+        <div><label for="fl-stage">Case status</label><select id="fl-stage"></select></div>
+        <div><label for="fl-cat">Grievance category</label><select id="fl-cat"></select></div>
+        <div><label for="fl-officer">Officer</label><select id="fl-officer"></select></div>
+        <div><label for="fl-from">From date</label><input id="fl-from" type="date"></div>
+        <div><label for="fl-to">To date</label><input id="fl-to" type="date"></div>
+      </div>
+      <div class="btn-row"><button class="btn small secondary" id="fl-clear">Clear filters</button></div>
+    </details>
+
+    <div class="kpi-group-title">Land &amp; possession (DEMO plots)</div>
+    <div class="grid grid-4" id="kpi-land"></div>
+    <div class="kpi-group-title">Grievances</div>
+    <div class="grid grid-4" id="kpi-grv"></div>
+
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card"><h3>Grievances by status</h3><div class="chart-box"><canvas id="ch-stage" aria-label="Grievances by status"></canvas></div></div>
+      <div class="card"><h3>Plots by status</h3><div class="chart-box"><canvas id="ch-plot" aria-label="Plots by status"></canvas></div></div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button data-tab="grv" class="active">📝 Grievances</button>
+      <button data-tab="plots">🗺 Plots</button>
+      <button data-tab="reports">📄 Reports</button>
+      <button data-tab="audit">🧾 Audit trail</button>
+      <button data-tab="users">👥 Officers &amp; roles</button>
+    </div>
+    <section id="tab-grv" class="card"></section>
+    <section id="tab-plots" class="card hidden"></section>
+    <section id="tab-reports" class="card hidden"></section>
+    <section id="tab-audit" class="card hidden"></section>
+    <section id="tab-users" class="card hidden"></section>
+  </section>
+</main>
+
+<div id="modal-root"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="common.js"></script>
+<script src="demo-data.js"></script>
+<script>
+(function () {
+  var L = LRMS, $ = L.$, $all = L.$all, esc = L.esc;
+  L.renderHeader("dash");
+  var me = L.officer();
+
+  // ================= SIGN IN =================
+  if (!me) {
+    $("#signin").classList.remove("hidden");
+    $("#si-officer").innerHTML = L.OFFICERS.map(function (o) {
+      return "<option value='" + esc(o.id) + "'>" + esc(o.id) + " - " + esc(L.ROLES[o.role].name) + "</option>"; }).join("");
+    $("#si-btn").onclick = function () { L.signIn($("#si-officer").value); location.reload(); };
+    return;
+  }
+  $("#dash").classList.remove("hidden");
+  if (!L.db) L.showMsg("#page-msg", "warn", "The database is not connected, so no grievances can be shown. Plot figures below use demo data.", L.dbError);
+
+  var grievances = [], plotUpdates = [], plots = DEMO.plots.slice(), charts = {};
+  var FVOS = L.OFFICERS.filter(function (o) { return o.role === "FVO"; });
+  var ASSIGNABLE = L.OFFICERS.filter(function (o) { return o.role !== "RO"; });
+
+  // ---------- Filters ----------
+  function opts(sel, list, all) { $(sel).innerHTML = "<option value=''>" + all + "</option>" + list.map(function (x) { return "<option>" + esc(x) + "</option>"; }).join(""); }
+  opts("#fl-village", DEMO.villages.map(function (v) { return v.name; }).concat(["Other village (DEMO)"]), "All villages");
+  opts("#fl-stage", L.STAGES, "All");
+  opts("#fl-cat", L.CATEGORIES, "All");
+  opts("#fl-officer", L.OFFICERS.map(function (o) { return o.id; }), "All officers");
+  $all(".filters input, .filters select").forEach(function (el) { el.addEventListener("input", render); el.addEventListener("change", render); });
+  $("#fl-clear").onclick = function () { $all(".filters input, .filters select").forEach(function (el) { el.value = ""; }); render(); };
+  function F(id) { return $("#fl-" + id).value.trim(); }
+  function plotMatches(p) {
+    return (!F("village") || p.village === F("village")) && (!F("khata") || L.norm(p.khata) === L.norm(F("khata"))) &&
+      (!F("plot") || L.normPlot(p.plot) === L.normPlot(F("plot")));
+  }
+  function grvMatches(g) {
+    var d = new Date(g.created_at);
+    return (!F("village") || g.location === F("village")) && (!F("khata") || L.norm(g.khata_no) === L.norm(F("khata"))) &&
+      (!F("plot") || L.normPlot(g.plot_no) === L.normPlot(F("plot"))) && (!F("stage") || g.stage === F("stage")) &&
+      (!F("cat") || g.category === F("cat")) && (!F("officer") || g.assigned_to === F("officer") ||
+        (g.history || []).some(function (h) { return h.by === F("officer"); })) &&
+      (!F("from") || d >= new Date(F("from"))) && (!F("to") || d <= new Date(F("to") + "T23:59:59"));
+  }
+  // Field officers see only grievances assigned to them
+  function visibleGrievances() {
+    return grievances.filter(function (g) { return me.role !== "FVO" || g.assigned_to === me.id; });
+  }
+
+  // ---------- Load ----------
+  function load() {
+    return L.loadRecords(null).then(function (r) {
+      if (r.error && L.db) L.showMsg("#page-msg", "err", "Sorry, records could not be loaded.", r.error);
+      var all = r.data || [];
+      grievances = all.filter(function (x) { return x.record_type === "Grievance"; });
+      plotUpdates = all.filter(function (x) { return x.record_type === "Plot update"; });
+      plots = L.mergePlotUpdates(DEMO.plots, plotUpdates);
+      render();
+    });
+  }
+
+  // ---------- KPIs + charts ----------
+  function kpi(v, label, dot) { return "<div class='kpi'><div class='v'>" + v + "</div><div class='l'>" + (dot ? "<i class='dot " + dot + "'></i>" : "") + esc(label) + "</div></div>"; }
+  function render() {
+    var ps = plots.filter(plotMatches), gs = visibleGrievances().filter(grvMatches);
+    var cnt = function (arr, fn) { return arr.filter(fn).length; };
+    $("#kpi-land").innerHTML =
+      kpi(ps.length, "Total acquired plots") +
+      kpi(cnt(ps, function (p) { return p.possession === "Completed"; }), "Possession completed", "Green") +
+      kpi(cnt(ps, function (p) { return p.possession !== "Completed"; }), "Physical possession pending") +
+      kpi(cnt(ps, function (p) { return p.demarcation !== "Completed"; }), "Plot marking pending", "Red") +
+      kpi(cnt(ps, function (p) { return p.fieldStatus !== "Completed"; }), "Field verification pending", "Yellow") +
+      kpi(cnt(ps, function (p) { return p.status === "Orange" || L.detectDiscrepancies(p).length; }), "Record discrepancies", "Orange");
+    $("#kpi-grv").innerHTML =
+      kpi(gs.length, "Total grievances") +
+      kpi(cnt(gs, function (g) { return g.stage === "Submitted"; }), "New grievances") +
+      kpi(cnt(gs, function (g) { return g.stage === "Under Examination" || g.stage === "Under Scrutiny"; }), "Under scrutiny / examination") +
+      kpi(cnt(gs, function (g) { return g.stage === "Field Verification Required"; }), "Pending field verification") +
+      kpi(cnt(gs, function (g) { return g.stage === "Disposed"; }), "Disposed") +
+      kpi("-", "Overdue (no official SLA configured)");
+    drawCharts(ps, gs);
+    renderGrv(gs); renderPlots(ps); renderReports(); renderAudit(); renderUsers(); renderNotifs();
+  }
+  function drawCharts(ps, gs) {
+    if (!window.Chart) {
+      $all(".chart-box").forEach(function (el) { el.innerHTML = "<p class='small muted'>Charts could not load (Chart.js not available). The numbers above are still correct.</p>"; });
+      return;
+    }
+    var dark = matchMedia("(prefers-color-scheme: dark)").matches, ink = dark ? "#c3ccd5" : "#4a5663", grid = dark ? "#2c3945" : "#e6eaee";
+    Chart.defaults.color = ink; Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+    var stageCounts = L.STAGES.map(function (s) { return gs.filter(function (g) { return g.stage === s; }).length; });
+    var st = Object.keys(L.PLOT_STATUS), plotCounts = st.map(function (s) { return ps.filter(function (p) { return p.status === s; }).length; });
+    var base = { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: function (c) { return " " + c.parsed.x + (c.parsed.x === 1 ? " record" : " records"); } } } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: grid } }, y: { grid: { display: false } } } };
+    if (charts.stage) charts.stage.destroy();
+    charts.stage = new Chart($("#ch-stage"), { type: "bar", options: base, data: { labels: L.STAGES.map(function (x) { return x.replace("Field Verification Required", "Field Verif. Reqd."); }),
+      datasets: [{ data: stageCounts, backgroundColor: dark ? "#3987e5" : "#2a78d6", borderRadius: 4, maxBarThickness: 26 }] } });
+    if (charts.plot) charts.plot.destroy();
+    charts.plot = new Chart($("#ch-plot"), { type: "bar", data: {
+      labels: st,
+      datasets: [{ data: plotCounts, backgroundColor: st.map(function (s) { return L.STATUS_HEX[s]; }), borderRadius: 4, maxBarThickness: 26 }] },
+      options: Object.assign({}, base, { plugins: { legend: { display: false }, tooltip: { callbacks: {
+        title: function (c) { return c[0].label + " - " + L.PLOT_STATUS[c[0].label]; },
+        label: function (c) { return " " + c.parsed.x + (c.parsed.x === 1 ? " plot" : " plots"); } } } } }) });
+  }
+
+  // ---------- Grievance list ----------
+  function renderGrv(gs) {
+    var html = "<h2>Grievances <span class='muted small'>(" + gs.length + " shown" + (me.role === "FVO" ? ", assigned to you" : "") + ")</span></h2>";
+    if (!gs.length) html += "<p class='muted'>No grievances match. Citizens register grievances on the Home page.</p>";
+    else html += "<div class='table-wrap'><table class='stack'><thead><tr><th>Reference</th><th>Registered</th><th>Applicant</th><th>Village / Plot</th><th>Category</th><th>Urgency</th><th>Status</th><th>Assigned</th></tr></thead><tbody>" +
+      gs.map(function (g) {
+        return "<tr class='clickable' data-id='" + esc(g.id) + "' tabindex='0'><td data-l='Reference'><b>" + esc(g.ref_no) + "</b></td>" +
+          "<td data-l='Registered'>" + esc(L.fmtDate(g.created_at)) + "</td><td data-l='Applicant'>" + esc(g.applicant_name) + "</td>" +
+          "<td data-l='Village / Plot'>" + esc(g.location) + (g.plot_no ? " / " + esc(g.khata_no || "-") + "/" + esc(g.plot_no) : "") + "</td>" +
+          "<td data-l='Category'>" + esc(g.category) + "</td><td data-l='Urgency' class='urg-" + esc(g.urgency) + "'><b>" + esc(g.urgency) + "</b></td>" +
+          "<td data-l='Status'>" + L.stagePill(g.stage) + "</td><td data-l='Assigned'>" + esc(g.assigned_to || "-") + "</td></tr>";
+      }).join("") + "</tbody></table></div>";
+    $("#tab-grv").innerHTML = html;
+    $all("#tab-grv tr[data-id]").forEach(function (tr) {
+      var open = function () { openGrv(tr.getAttribute("data-id")); };
+      tr.onclick = open; tr.onkeydown = function (e) { if (e.key === "Enter") open(); };
+    });
+  }
+
+  // ---------- Grievance detail + actions ----------
+  function findG(id) { return grievances.filter(function (g) { return g.id === id; })[0]; }
+  function closeModal() { $("#modal-root").innerHTML = ""; document.body.style.overflow = ""; }
+  function openGrv(id) {
+    var g = findG(id); if (!g) return;
+    var p = g.plot_id ? plots.filter(function (x) { return x.id === g.plot_id; })[0] : null;
+    var edit = L.can("grv.edit"), disposed = g.stage === "Disposed";
+    var h = "<div class='modal-back' id='mb'><div class='modal' role='dialog' aria-modal='true' aria-labelledby='m-title'>" +
+      "<header><h2 id='m-title'>" + esc(g.ref_no) + "</h2>" + L.stagePill(g.stage) + "<button class='btn small secondary' id='m-close'>✕ Close</button></header>" +
+      "<div id='m-msg'></div><div class='grid grid-2'><div><dl class='kv'>" +
+      kv("Registered", L.fmtDateTime(g.created_at)) + kv("Applicant", g.applicant_name) + kv("Mobile", g.mobile) + kv("Email", g.email || "-") +
+      kv("Landowner / affected", g.landowner_name) + kv("Village", g.location) + kv("Khata / Plot", (g.khata_no || "-") + " / " + (g.plot_no || "-")) +
+      kv("Category", g.category) + kv("Urgency", g.urgency) + kv("Language", g.language) + kv("Assigned to", g.assigned_to || "-") +
+      kv("Public remarks", g.public_remarks || "-") + kv("Attachments", (g.attachments || []).map(function (a) { return a.kind + ": " + a.name; }).join(", ") || "-") +
+      "</dl><h3 style='margin-top:12px'>Description</h3><p style='white-space:pre-wrap'>" + esc(g.description) + "</p>" +
+      (p ? "<p>Linked plot: <a href='field.html?plot=" + encodeURIComponent(p.id) + "#find'>" + esc(p.id) + "</a> " + L.statusPill(p.status) + "</p>" : "<p class='small muted'>No plot record matched (khata/plot not given or not found).</p>") +
+      ((g.details || {}).field_verification ? "<div class='msg info'>Field verification: result <b>" + esc(g.details.field_verification.result) + "</b> by " +
+        esc(g.details.field_verification.by) + " on " + esc(L.fmtDateTime(g.details.field_verification.at)) + " - " + esc(g.details.field_verification.remarks) + "</div>" : "") +
+      (g.disposal ? "<div class='msg ok'><b>Disposed</b> (" + esc(g.disposal.category) + ") by " + esc(g.disposal.by) + " on " + esc(L.fmtDateTime(g.disposal.at)) +
+        "<br>Action taken: " + esc(g.disposal.action_taken) + "<br>Final remarks: " + esc(g.disposal.final_remarks) + "</div>" : "") +
+      "</div><div><h3>Internal notes <span class='small muted'>(never shown to the citizen)</span></h3>" +
+      ((g.internal_notes || []).length ? "<ul class='timeline'>" + g.internal_notes.map(function (n) {
+        return "<li><div class='when'>" + esc(L.fmtDateTime(n.at)) + " · " + esc(n.by) + "</div>" + esc(n.text) + "</li>"; }).join("") + "</ul>" : "<p class='small muted'>None.</p>") +
+      "<h3>Audit trail</h3><ul class='timeline'>" + (g.history || []).slice().reverse().map(function (x) {
+        return "<li><div class='when'>" + esc(L.fmtDateTime(x.at)) + " · " + esc(x.by) + (x.public === false ? " · internal" : "") + "</div>" + esc(x.action) +
+          (x.old_status !== x.new_status && (x.old_status || x.new_status) ? " <span class='small'>(" + esc(x.old_status || "-") + " → " + esc(x.new_status || "-") + ")</span>" : "") +
+          (x.note ? "<div class='small muted'>" + esc(x.note) + "</div>" : "") + "</li>"; }).join("") + "</ul></div></div>";
+
+    if (edit && !disposed) {
+      h += "<h3 style='margin-top:10px'>Actions</h3>" +
+        box("assign", "👤 Assign / transfer", "<label for='a-off'>Officer</label><select id='a-off'>" + ASSIGNABLE.map(function (o) {
+          return "<option value='" + o.id + "'" + (o.id === g.assigned_to ? " selected" : "") + ">" + o.id + " - " + esc(L.ROLES[o.role].name) + "</option>"; }).join("") + "</select>" +
+          "<label for='a-note'>Reason / instructions</label><input id='a-note'><button class='btn small' id='a-go' style='margin-top:8px'>Assign</button>") +
+        box("stage", "🔄 Update status", "<label for='s-new'>New status</label><select id='s-new'>" + ["Under Scrutiny", "Under Examination"].map(function (s) {
+          return "<option>" + s + "</option>"; }).join("") + "</select><label for='s-rem'>Remarks *</label><input id='s-rem'><button class='btn small' id='s-go' style='margin-top:8px'>Update</button>") +
+        box("fv", "📍 Schedule field verification", "<label for='f-off'>Field verification officer</label><select id='f-off'>" + FVOS.map(function (o) {
+          return "<option>" + o.id + "</option>"; }).join("") + "</select><label for='f-date'>Planned date</label><input id='f-date' type='date'>" +
+          "<label for='f-note'>Instructions</label><input id='f-note'><button class='btn small' id='f-go' style='margin-top:8px'>Assign field verification</button>") +
+        box("docs", "📎 Request additional documents", "<label for='d-list'>Documents needed (shown to citizen)</label><input id='d-list' placeholder='e.g. copy of award, ROR'>" +
+          "<button class='btn small' id='d-go' style='margin-top:8px'>Send request</button>") +
+        box("note", "🗒 Add internal note", "<label for='n-text'>Note (internal only)</label><textarea id='n-text'></textarea><label for='n-file'>Upload document <span class='opt'>(name recorded)</span></label><input id='n-file' type='file'>" +
+          "<button class='btn small' id='n-go' style='margin-top:8px'>Save note</button>") +
+        box("resp", "💬 Official response to citizen", "<label for='r-text'>Response (public)</label><textarea id='r-text'>" + esc(g.public_remarks || "") + "</textarea>" +
+          "<button class='btn small' id='r-go' style='margin-top:8px'>Publish response</button>") +
+        box("act", "✔ Record action taken", "<label for='t-text'>Action taken</label><textarea id='t-text'></textarea><button class='btn small' id='t-go' style='margin-top:8px'>Record</button>") +
+        box("urg", "⚡ Change urgency", "<select id='u-new'>" + ["Low", "Medium", "High"].map(function (u) { return "<option" + (u === g.urgency ? " selected" : "") + ">" + u + "</option>"; }).join("") +
+          "</select><button class='btn small' id='u-go' style='margin-top:8px'>Save</button>");
+      if (L.can("grv.dispose")) h += box("disp", "🏁 Dispose grievance",
+        "<label for='x-cat'>Disposal category *</label><select id='x-cat'><option value=''>- Select -</option><option>Resolved - relief given</option><option>Resolved - clarification given</option>" +
+        "<option>Rejected - not maintainable</option><option>Transferred to other authority</option><option>Closed - duplicate</option></select>" +
+        "<label for='x-act'>Action taken *</label><textarea id='x-act'></textarea><label for='x-rem'>Final remarks / decision (shown to citizen) *</label><textarea id='x-rem'></textarea>" +
+        "<label for='x-doc'>Supporting document <span class='opt'>(if applicable)</span></label><input id='x-doc' type='file'>" +
+        "<label for='x-auth'>Re-enter your Officer ID to authenticate *</label><input id='x-auth' autocomplete='off' placeholder='" + esc(me.id) + "'>" +
+        "<p class='hint'>Production: this step asks for your PIN + OTP.</p><button class='btn danger' id='x-go' style='margin-top:8px'>Dispose grievance</button>");
+    }
+    h += "<div class='btn-row' style='margin-top:14px'>" +
+      (L.can("plot.verify") && g.stage === "Field Verification Required" ? "<a class='btn accent' href='field.html?plot=" + encodeURIComponent(g.plot_id || "") + "&grv=" + encodeURIComponent(g.ref_no) + "#verify'>📍 Do field verification</a>" : "") +
+      (disposed ? "<button class='btn' id='rep-disp'>🖨 Grievance Disposal Report</button>" : "") +
+      (disposed && L.can("grv.dispose") ? "<button class='btn secondary' id='reopen'>↩ Reopen grievance</button>" : "") +
+      "<button class='btn secondary' id='rep-one'>🖨 Grievance report</button></div></div></div>";
+    $("#modal-root").innerHTML = h; document.body.style.overflow = "hidden";
+    $("#m-close").onclick = closeModal;
+    $("#mb").onclick = function (e) { if (e.target.id === "mb") closeModal(); };
+    document.onkeydown = function (e) { if (e.key === "Escape") closeModal(); };
+    bindActions(g);
+  }
+  function kv(k, v) { return "<dt>" + esc(k) + "</dt><dd>" + esc(v == null ? "-" : v) + "</dd>"; }
+  function box(id, title, inner) { return "<details class='action-box'><summary>" + title + "</summary>" + inner + "</details>"; }
+  function val(id) { var el = $("#" + id); return el ? el.value.trim() : ""; }
+
+  // Save changes to a grievance and append audit entries (append-only is also enforced by the database)
+  function save(g, changes, entries, okText) {
+    if (!L.dbReady("#m-msg")) return;
+    changes.history = (g.history || []).concat(entries);
+    changes.updated_by = me.id;
+    L.db.from(L.APP.table).update(changes).eq("id", g.id).select("*").single().then(function (r) {
+      if (r.error) { L.showMsg("#m-msg", "err", "Sorry, the change could not be saved. If someone else changed this grievance, close and reopen it.", r.error); return; }
+      var i = grievances.indexOf(g); grievances[i] = r.data;
+      render(); openGrv(g.id);
+      L.showMsg("#m-msg", "ok", okText);
+    });
+  }
+  function bindActions(g) {
+    var on = function (id, fn) { var b = $("#" + id); if (b) b.onclick = fn; };
+    on("a-go", function () {
+      var o = val("a-off");
+      save(g, { assigned_to: o, stage: g.stage === "Submitted" ? "Under Scrutiny" : g.stage },
+        [L.histEntry("Grievance assigned for examination", g.stage, g.stage === "Submitted" ? "Under Scrutiny" : g.stage, { note: "To " + o + (val("a-note") ? ": " + val("a-note") : "") })],
+        "Grievance assigned to " + o + ".");
+    });
+    on("s-go", function () {
+      if (!val("s-rem")) { L.showMsg("#m-msg", "err", "Remarks are required to change the status."); return; }
+      save(g, { stage: val("s-new") }, [L.histEntry("Status updated", g.stage, val("s-new"), { note: val("s-rem") })], "Status updated.");
+    });
+    on("f-go", function () {
+      var o = val("f-off"), d = g.details || {};
+      d.fv_assigned = { officer: o, planned: val("f-date") || null, note: val("f-note") || null, at: new Date().toISOString(), by: me.id };
+      save(g, { stage: "Field Verification Required", assigned_to: o, details: d,
+        public_remarks: "Field verification of the plot has been scheduled." + (val("f-date") ? " Planned date: " + L.fmtDate(val("f-date")) + "." : "") },
+        [L.histEntry("Field verification scheduled", g.stage, "Field Verification Required", { note: "To " + o + (val("f-note") ? ": " + val("f-note") : "") })],
+        "Field verification assigned to " + o + ". It now appears in their dashboard.");
+    });
+    on("d-go", function () {
+      if (!val("d-list")) { L.showMsg("#m-msg", "err", "Please list the documents needed."); return; }
+      save(g, { public_remarks: "Please submit the following documents at the Land & Revenue office: " + val("d-list") },
+        [L.histEntry("Additional documents requested", g.stage, g.stage, { note: val("d-list") })], "Document request recorded and shown to the citizen.");
+    });
+    on("n-go", function () {
+      var f = ($("#n-file").files[0] || {}).name;
+      if (!val("n-text") && !f) { L.showMsg("#m-msg", "err", "Please write a note or choose a file."); return; }
+      var notes = (g.internal_notes || []).concat([{ at: new Date().toISOString(), by: me.id, text: val("n-text") + (f ? " [Document: " + f + "]" : "") }]);
+      save(g, { internal_notes: notes }, [L.histEntry(f ? "Internal note + document added" : "Internal note added", g.stage, g.stage, { public: false })], "Internal note saved.");
+    });
+    on("r-go", function () {
+      if (!val("r-text")) { L.showMsg("#m-msg", "err", "Please write the response."); return; }
+      save(g, { public_remarks: val("r-text") }, [L.histEntry("Official response communicated", g.stage, g.stage)], "Response published on the tracking page.");
+    });
+    on("t-go", function () {
+      if (!val("t-text")) { L.showMsg("#m-msg", "err", "Please describe the action taken."); return; }
+      var d = g.details || {}; d.actions = (d.actions || []).concat([{ at: new Date().toISOString(), by: me.id, text: val("t-text") }]);
+      save(g, { stage: "Action Taken", details: d }, [L.histEntry("Action taken recorded", g.stage, "Action Taken", { note: val("t-text") })], "Action taken recorded.");
+    });
+    on("u-go", function () {
+      save(g, { urgency: val("u-new") }, [L.histEntry("Urgency changed from " + g.urgency + " to " + val("u-new"), g.stage, g.stage, { public: false })], "Urgency updated.");
+    });
+    on("x-go", function () {
+      var miss = [];
+      if (!val("x-cat")) miss.push("disposal category"); if (!val("x-act")) miss.push("action taken"); if (!val("x-rem")) miss.push("final remarks");
+      if (val("x-auth") !== me.id) miss.push("your correct Officer ID");
+      if (miss.length) { L.showMsg("#m-msg", "err", "Please give: " + miss.join(", ") + "."); return; }
+      if (!confirm("Are you sure you want to dispose this grievance?\n\n" + g.ref_no)) return;
+      var disp = { category: val("x-cat"), action_taken: val("x-act"), final_remarks: val("x-rem"), document: ($("#x-doc").files[0] || {}).name || null,
+        by: me.id, at: new Date().toISOString() };
+      save(g, { stage: "Disposed", disposal: disp, public_remarks: val("x-rem") },
+        [L.histEntry("Grievance disposed (" + disp.category + ")", g.stage, "Disposed")], "Grievance disposed. You can now print the disposal report.");
+    });
+    on("reopen", function () {
+      var why = prompt("Reason for reopening (required):");
+      if (!why) return;
+      save(g, { stage: "Under Scrutiny", public_remarks: "The grievance has been reopened for further examination." },
+        [L.histEntry("Grievance reopened", "Disposed", "Under Scrutiny", { note: why })], "Grievance reopened.");
+    });
+    on("rep-disp", function () { disposalReport(g); });
+    on("rep-one", function () { grievanceReport([g], "Grievance Report - " + g.ref_no, true); });
+  }
+
+  // ================= REPORTS =================
+  function tbl(rows, cols) {
+    return "<table><thead><tr>" + cols.map(function (c) { return "<th>" + esc(c.label) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+      rows.map(function (r) { return "<tr>" + cols.map(function (c) { return "<td>" + esc(typeof c.get === "function" ? c.get(r) : r[c.key]) + "</td>"; }).join("") + "</tr>"; }).join("") +
+      "</tbody></table>";
+  }
+  function disposalReport(g) {
+    var fv = (g.details || {}).field_verification, acts = (g.details || {}).actions || [];
+    L.printReport("Grievance Disposal Report", "<table><tbody>" + [
+      ["Reference number", g.ref_no], ["Applicant", g.applicant_name], ["Village / Khata / Plot", g.location + " / " + (g.khata_no || "-") + " / " + (g.plot_no || "-")],
+      ["Subject (category)", g.category], ["Grievance", g.description], ["Registration date", L.fmtDate(g.created_at)],
+      ["Actions taken", acts.map(function (a) { return L.fmtDate(a.at) + ": " + a.text + " (" + a.by + ")"; }).join(" | ") || "-"],
+      ["Field verification", fv ? "Result " + fv.result + " by " + fv.by + " on " + L.fmtDate(fv.at) + " - " + fv.remarks : "Not conducted"],
+      ["Disposal category", g.disposal.category], ["Action taken (disposal)", g.disposal.action_taken], ["Final decision / response", g.disposal.final_remarks],
+      ["Supporting document", g.disposal.document || "-"], ["Disposal date", L.fmtDateTime(g.disposal.at)], ["Disposing officer", g.disposal.by]
+    ].map(function (r) { return "<tr><th style='width:30%'>" + esc(r[0]) + "</th><td>" + esc(r[1]) + "</td></tr>"; }).join("") + "</tbody></table>" +
+      "<h3>Audit trail</h3>" + tbl(g.history || [], [{ label: "Date/time", get: function (h) { return L.fmtDateTime(h.at); } }, { label: "Officer", key: "by" },
+        { label: "Action", key: "action" }, { label: "Old status", key: "old_status" }, { label: "New status", key: "new_status" }]));
+  }
+  var GCOLS = [{ label: "Reference", key: "ref_no" }, { label: "Registered", get: function (g) { return L.fmtDate(g.created_at); } },
+    { label: "Applicant", key: "applicant_name" }, { label: "Village", key: "location" }, { label: "Khata", key: "khata_no" }, { label: "Plot", key: "plot_no" },
+    { label: "Category", key: "category" }, { label: "Urgency", key: "urgency" }, { label: "Status", key: "stage" }, { label: "Assigned", key: "assigned_to" },
+    { label: "Last update", get: function (g) { return L.fmtDateTime(g.updated_at); } }];
+  var PCOLS = [{ label: "Village", key: "village" }, { label: "Khata", key: "khata" }, { label: "Plot", key: "plot" }, { label: "Area acq. (ac)", key: "areaAcq" },
+    { label: "Area record (ac)", key: "areaRec" }, { label: "Acquired (ac)", key: "acquired" }, { label: "Compensation", key: "comp" }, { label: "R&R", key: "rr" },
+    { label: "Possession", key: "possession" }, { label: "Demarcation", key: "demarcation" }, { label: "Field verification", key: "fieldStatus" },
+    { label: "Status", get: function (p) { return p.status + " - " + L.PLOT_STATUS[p.status]; } },
+    { label: "Discrepancies", get: function (p) { return L.detectDiscrepancies(p).map(function (d) { return d.type; }).join(", "); } }];
+  function grievanceReport(rows, title) { L.printReport(title, "<p>Records: " + rows.length + "</p>" + tbl(rows, GCOLS)); }
+  function reportDefs() {
+    var ps = plots.filter(plotMatches), gs = visibleGrievances().filter(grvMatches);
+    var fvRows = plotUpdates.filter(function (u) { return (u.details || {}).kind === "Field verification"; });
+    var FVCOLS = [{ label: "Date", get: function (u) { return L.fmtDateTime(u.created_at); } }, { label: "Village", key: "location" }, { label: "Khata", key: "khata_no" },
+      { label: "Plot", key: "plot_no" }, { label: "Officer", key: "updated_by" }, { label: "Result", key: "plot_status" },
+      { label: "GPS", get: function (u) { var g = (u.details || {}).gps; return g ? g.lat.toFixed(6) + ", " + g.lng.toFixed(6) + (g.simulated ? " (sim)" : "") : ""; } },
+      { label: "Area (ac)", get: function (u) { var a = (u.details || {}).area_acre; return a ? a.toFixed(3) : ""; } },
+      { label: "Possession", get: function (u) { return (u.details || {}).possession; } }, { label: "Remarks", get: function (u) { return (u.details || {}).remarks; } }];
+    var villages = DEMO.villages.map(function (v) { return v.name; });
+    var vRows = villages.map(function (v) {
+      var vp = ps.filter(function (p) { return p.village === v; }), vg = gs.filter(function (g) { return g.location === v; });
+      return { village: v, plots: vp.length, poss: vp.filter(function (p) { return p.possession === "Completed"; }).length,
+        pend: vp.filter(function (p) { return p.possession !== "Completed"; }).length, disc: vp.filter(function (p) { return L.detectDiscrepancies(p).length; }).length,
+        grv: vg.length, open: vg.filter(function (g) { return g.stage !== "Disposed"; }).length };
+    });
+    return [
+      { name: "Plot Report", rows: ps, cols: PCOLS },
+      { name: "Field Verification Report", rows: fvRows, cols: FVCOLS },
+      { name: "Possession Status Report", rows: ps, cols: PCOLS.filter(function (c) { return ["Village", "Khata", "Plot", "Acquired (ac)", "Possession", "Demarcation", "Status"].indexOf(c.label) !== -1; }) },
+      { name: "Grievance Report", rows: gs, cols: GCOLS },
+      { name: "Village-wise Report", rows: vRows, cols: [{ label: "Village", key: "village" }, { label: "Plots", key: "plots" }, { label: "Possession completed", key: "poss" },
+        { label: "Possession pending", key: "pend" }, { label: "Plots with discrepancies", key: "disc" }, { label: "Grievances", key: "grv" }, { label: "Grievances open", key: "open" }] },
+      { name: "Pending Cases Report", rows: gs.filter(function (g) { return g.stage !== "Disposed"; }), cols: GCOLS }
+    ];
+  }
+  function renderReports() {
+    if (!L.can("reports")) { $("#tab-reports").innerHTML = "<h2>Reports</h2><p class='muted'>Your role does not include report generation.</p>"; return; }
+    var defs = reportDefs();
+    $("#tab-reports").innerHTML = "<h2>Generate reports</h2><p class='small muted'>Reports follow the filters above. \"Excel\" downloads a CSV file that opens in Excel. \"PDF\" opens the print window - choose \"Save as PDF\".</p>" +
+      defs.map(function (d, i) {
+        return "<div class='rep-row'><b>Generate " + esc(d.name) + "</b><span class='muted small'>" + d.rows.length + " rows</span>" +
+          "<button class='btn small' data-pdf='" + i + "'>PDF</button><button class='btn small secondary' data-xls='" + i + "'>Excel</button></div>";
+      }).join("");
+    $all("[data-pdf]").forEach(function (b) { b.onclick = function () { var d = reportDefs()[+b.getAttribute("data-pdf")]; L.printReport(d.name, "<p>Rows: " + d.rows.length + "</p>" + tbl(d.rows, d.cols)); }; });
+    $all("[data-xls]").forEach(function (b) { b.onclick = function () { var d = reportDefs()[+b.getAttribute("data-xls")];
+      L.download(d.name.replace(/\s+/g, "-") + "-" + new Date().toISOString().slice(0, 10) + ".csv", L.toCSV(d.rows, d.cols)); }; });
+  }
+
+  // ================= PLOTS TAB =================
+  function renderPlots(ps) {
+    $("#tab-plots").innerHTML = "<h2>Plot records <span class='muted small'>(" + ps.length + ")</span></h2><div class='table-wrap'><table class='stack'><thead><tr>" +
+      "<th>Village</th><th>Khata / Plot</th><th>Acquired</th><th>Possession</th><th>Status</th><th>Flags</th><th></th></tr></thead><tbody>" +
+      ps.map(function (p) {
+        var d = L.detectDiscrepancies(p);
+        return "<tr><td data-l='Village'>" + esc(p.village) + "</td><td data-l='Khata / Plot'>" + esc(p.khata) + " / " + esc(p.plot) + "</td>" +
+          "<td data-l='Acquired'>" + p.acquired.toFixed(2) + " ac</td><td data-l='Possession'>" + esc(p.possession) + "</td><td data-l='Status'>" + L.statusPill(p.status) + "</td>" +
+          "<td data-l='Flags'>" + (d.length ? "⚠ " + esc(d.map(function (x) { return x.type; }).join(", ")) : "-") + "</td>" +
+          "<td data-l=''><a class='btn small secondary' href='field.html?plot=" + encodeURIComponent(p.id) + "#find'>Open on map</a></td></tr>";
+      }).join("") + "</tbody></table></div>";
+  }
+
+  // ================= AUDIT =================
+  function allAudit() {
+    var out = [];
+    grievances.concat(plotUpdates).forEach(function (r) {
+      (r.history || []).forEach(function (h) {
+        out.push({ at: h.at, by: h.by, action: h.action, old_status: h.old_status, new_status: h.new_status,
+          record: r.ref_no || ("Plot " + (r.khata_no || "") + "/" + (r.plot_no || "")) });
+      });
+    });
+    return out.sort(function (a, b) { return new Date(b.at) - new Date(a.at); });
+  }
+  function renderAudit() {
+    if (!L.can("audit")) { $("#tab-audit").innerHTML = "<h2>Audit trail</h2><p class='muted'>Only the Super Administrator and Senior Officer roles can view the full audit log. Each grievance's own trail is shown inside the grievance.</p>"; return; }
+    var rows = allAudit(), cols = [{ label: "Date/time", get: function (h) { return L.fmtDateTime(h.at); } }, { label: "Officer", key: "by" }, { label: "Record", key: "record" },
+      { label: "Action", key: "action" }, { label: "Old status", key: "old_status" }, { label: "New status", key: "new_status" }];
+    $("#tab-audit").innerHTML = "<h2>Audit trail <span class='muted small'>(" + rows.length + " entries, newest first)</span></h2>" +
+      "<p class='small muted'>The database refuses any change that edits or removes an existing audit entry (append-only).</p>" +
+      "<div class='btn-row'><button class='btn small secondary' id='aud-xls'>Download (Excel)</button></div>" +
+      "<div class='table-wrap' style='margin-top:10px;max-height:480px;overflow:auto'>" + tbl(rows.slice(0, 300), cols).replace("<table>", "<table class='stack'>") + "</div>";
+    $("#aud-xls").onclick = function () { L.download("Audit-trail.csv", L.toCSV(rows, cols)); };
+  }
+
+  // ================= OFFICERS & ROLES =================
+  function renderUsers() {
+    var perms = { "grv.view": "View grievances", "grv.edit": "Examine / update grievances", "grv.assign": "Assign cases", "grv.dispose": "Dispose grievances",
+      "plot.verify": "Field verification", "plot.status": "Change plot status", "doc.ai": "AI document analysis", "reports": "Reports", "audit": "Audit log", "users": "User management" };
+    var roles = Object.keys(L.ROLES);
+    $("#tab-users").innerHTML = "<h2>Officers &amp; role permissions</h2>" +
+      (L.can("users") ? "" : "<p class='small muted'>View only. Officer creation, deactivation and PIN reset are Super Administrator functions in production.</p>") +
+      "<div class='table-wrap'><table><thead><tr><th>Permission</th>" + roles.map(function (r) { return "<th>" + esc(L.ROLES[r].name) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+      Object.keys(perms).map(function (p) {
+        return "<tr><td>" + esc(perms[p]) + "</td>" + roles.map(function (r) { return "<td>" + (L.ROLES[r].perms.indexOf(p) !== -1 ? "✔" : "") + "</td>"; }).join("") + "</tr>";
+      }).join("") + "</tbody></table></div><h3 style='margin-top:14px'>Demo officers</h3><ul>" +
+      L.OFFICERS.map(function (o) { return "<li><b>" + esc(o.id) + "</b> - " + esc(L.ROLES[o.role].name) + "</li>"; }).join("") + "</ul>" +
+      "<div class='msg info'>Production design: each officer gets an individually generated PIN (hashed with Argon2, never shown in plain text), lock-out after 5 failed attempts, " +
+      "PIN expiry/rotation, OTP as a second factor, 15-minute session timeout and reset only through an authorised administrative procedure. See docs/ARCHITECTURE.md.</div>";
+  }
+
+  // ================= NOTIFICATIONS =================
+  function notifications() {
+    var out = [], week = Date.now() - 7 * 86400000;
+    visibleGrievances().forEach(function (g) {
+      if (g.stage === "Submitted") out.push({ g: g, t: "New grievance received: " + g.ref_no + " (" + g.category + ")", at: g.created_at });
+      if (g.stage === "Field Verification Required" && g.assigned_to === me.id) out.push({ g: g, t: "Field verification assigned to you: " + g.ref_no, at: g.updated_at });
+      if (g.stage !== "Disposed" && new Date(g.updated_at) < week) out.push({ g: g, t: "Grievance pending action for over 7 days: " + g.ref_no, at: g.updated_at });
+      (g.history || []).forEach(function (h) {
+        if (new Date(h.at) < week) return;
+        if (/Field verification completed/.test(h.action)) out.push({ g: g, t: "Field verification completed: " + g.ref_no, at: h.at });
+        if (/Representation/.test(h.action)) out.push({ g: g, t: "Representation / additional submission from citizen: " + g.ref_no, at: h.at });
+        if (/disposed/i.test(h.action)) out.push({ g: g, t: "Grievance disposed: " + g.ref_no, at: h.at });
+      });
+    });
+    plotUpdates.forEach(function (u) {
+      if ((u.details || {}).kind === "Field verification" && new Date(u.created_at) >= week)
+        out.push({ t: "Plot verification completed: Plot " + u.plot_no + " (" + u.location + ") - " + u.plot_status, at: u.created_at });
+    });
+    return out.sort(function (a, b) { return new Date(b.at) - new Date(a.at); });
+  }
+  function renderNotifs() {
+    var n = notifications();
+    $("#notif-count").textContent = n.length;
+    $("#notif-panel").innerHTML = "<h3>In-app notifications</h3>" + (n.length ? n.slice(0, 30).map(function (x, i) {
+      return "<div class='notif' data-i='" + i + "'>" + esc(x.t) + "<div class='small muted'>" + esc(L.fmtDateTime(x.at)) + "</div></div>"; }).join("")
+      : "<p class='muted small'>No notifications.</p>") + "<p class='small muted'>SMS / email / WhatsApp alerts can be added later through authorised organisational services only.</p>";
+    $all("#notif-panel .notif").forEach(function (el) { var x = n[+el.getAttribute("data-i")]; if (x.g) el.onclick = function () { openGrv(x.g.id); }; });
+  }
+  $("#notif-btn").onclick = function () { $("#notif-panel").classList.toggle("hidden"); };
+
+  // ================= UNIVERSAL SEARCH =================
+  $("#u-search").addEventListener("input", function () {
+    var q = this.value.trim(), box = $("#u-results");
+    if (q.length < 2) { box.innerHTML = ""; return; }
+    var nq = L.norm(q), digits = q.replace(/\D/g, "");
+    var gHits = visibleGrievances().filter(function (g) {
+      return [g.ref_no, g.applicant_name, g.landowner_name, g.location, g.category].some(function (x) { return L.norm(x).indexOf(nq) !== -1; }) ||
+        (digits.length >= 3 && (L.norm(g.ref_no).slice(-6).indexOf(digits) !== -1 || (g.mobile || "").indexOf(digits) !== -1)) ||
+        (q.indexOf("/") > 0 && L.normPlot((g.khata_no || "") + "/" + (g.plot_no || "")) === L.normPlot(q)) || L.normPlot(g.plot_no) === L.normPlot(q);
+    }).slice(0, 8);
+    var pHits = plots.filter(function (p) {
+      return [p.village, p.owner, p.notif, p.id].some(function (x) { return L.norm(x).indexOf(nq) !== -1; }) ||
+        L.normPlot(p.plot) === L.normPlot(q) || L.normPlot(p.khata + "/" + p.plot) === L.normPlot(q) ||
+        (p.sources || []).some(function (s) { return L.normPlot(s.plot) === L.normPlot(q); });
+    }).slice(0, 8);
+    box.innerHTML = "<div class='card' style='margin-top:8px'>" + (gHits.length + pHits.length ? "" : "<p class='muted'>Nothing found.</p>") +
+      gHits.map(function (g) { return "<div class='notif' data-g='" + esc(g.id) + "'>📝 <b>" + esc(g.ref_no) + "</b> - " + esc(g.applicant_name) + ", " + esc(g.location) + " · " + esc(g.stage) + "</div>"; }).join("") +
+      pHits.map(function (p) { return "<a class='notif' style='display:block;text-decoration:none;color:inherit' href='field.html?plot=" + encodeURIComponent(p.id) + "#find'>🗺 Plot " + esc(p.plot) +
+        " / Khata " + esc(p.khata) + " - " + esc(p.village) + " · " + esc(p.status) + "</a>"; }).join("") + "</div>";
+    $all("[data-g]", box).forEach(function (el) { el.onclick = function () { openGrv(el.getAttribute("data-g")); }; });
+  });
+
+  // ================= TABS =================
+  $all(".tabs button").forEach(function (b) {
+    b.onclick = function () {
+      $all(".tabs button").forEach(function (x) { x.classList.toggle("active", x === b); });
+      ["grv", "plots", "reports", "audit", "users"].forEach(function (t) { $("#tab-" + t).classList.toggle("hidden", t !== b.getAttribute("data-tab")); });
+    };
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>
