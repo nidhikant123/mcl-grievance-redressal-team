@@ -1,16 +1,14 @@
 // demo-data.js - FICTIONAL sample land records for the MCL-LRMS demonstration.
-// Village names are villages under Kaniha Area of MCL. Every other detail - owner
-// names, plots, areas, dates, references and coordinates - is MADE UP.
-// Boundaries are drawn on a synthetic grid; they are NOT real parcels, real village
-// locations or real MCL land.
+// Every village, name, plot, area, date, reference and coordinate here is MADE UP.
+// Boundaries are drawn on a synthetic grid; they are NOT real parcels or real MCL land.
 
 var DEMO = (function () {
   var TAHASIL = "Kaniha", DISTRICT = "Angul";
   // Synthetic grid origin (not a surveyed location)
   var ORIGIN = {
-    "Kaniha": [21.0950, 85.1050], "Telisingha": [21.0905, 85.1135], "Jarada": [21.0905, 85.1060],
-    "Patharmunda": [21.0990, 85.1120], "Gundurinali": [21.0860, 85.1050], "Badagunduri": [21.0860, 85.1140],
-    "Balrampur": [21.1000, 85.1030], "Adaitaprasad": [21.0950, 85.1200]
+    "Demopur (DEMO)": [21.0950, 85.1050], "Sampleguda (DEMO)": [21.0905, 85.1135], "Testpali (DEMO)": [21.0905, 85.1060],
+    "Mockgarh (DEMO)": [21.0990, 85.1120], "Dummypada (DEMO)": [21.0860, 85.1050], "Pilotnagar (DEMO)": [21.0860, 85.1140],
+    "Trialpur (DEMO)": [21.1000, 85.1030], "Modelguda (DEMO)": [21.0950, 85.1200]
   };
   var CELL_LAT = 0.00052, CELL_LNG = 0.00056; // about 58 m x 58 m (~0.83 acre)
 
@@ -28,94 +26,94 @@ var DEMO = (function () {
 
   // r/c = grid position; poly:false = location could not be reconstructed
   var raw = [
-    { id: "KN-145-234", v: "Kaniha", khata: "145", plot: "234", areaAcq: 0.82, areaRec: 0.81, acquired: 0.82, type: "Agricultural (Sarad)",
+    { id: "DP-145-234", v: "Demopur (DEMO)", khata: "145", plot: "234", areaAcq: 0.82, areaRec: 0.81, acquired: 0.82, type: "Agricultural (Sarad)",
       owner: "DEMO Owner Alpha", notif: "DEMO/LA/CBA/2009/017", acqDate: "2010-03-15", comp: "Paid", rr: "Provided", emp: "Employment provided",
       possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Orange", conf: 92, r: 0, c: 1,
       sources: [{ doc: "Award statement (DEMO)", plot: "234", khata: "145", name: "DEMO Owner Alpha" },
                 { doc: "Land record extract (DEMO)", plot: "234", khata: "145", name: "DEMO Ownr Alfa" }],
       landmarks: "About 120 m south-east of Sample Pond; east of Sample Village Road" },
-    { id: "KN-145-235", v: "Kaniha", khata: "145", plot: "235", areaAcq: 0.64, areaRec: 0.64, acquired: 0.64, type: "Agricultural (Sarad)",
+    { id: "DP-145-235", v: "Demopur (DEMO)", khata: "145", plot: "235", areaAcq: 0.64, areaRec: 0.64, acquired: 0.64, type: "Agricultural (Sarad)",
       owner: "DEMO Owner Alpha", notif: "DEMO/LA/CBA/2009/017", acqDate: "2010-03-15", comp: "Paid", rr: "Provided", emp: "Annuity",
       possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Green", conf: 88, r: 0, c: 2,
       sources: [{ doc: "Award statement (DEMO)", plot: "235", khata: "145", name: "DEMO Owner Alpha" }], landmarks: "Next to Plot 234" },
-    { id: "KN-121-124", v: "Kaniha", khata: "121", plot: "124", areaAcq: 1.10, areaRec: 1.10, acquired: 1.10, type: "Homestead (Gharabari)",
+    { id: "DP-121-124", v: "Demopur (DEMO)", khata: "121", plot: "124", areaAcq: 1.10, areaRec: 1.10, acquired: 1.10, type: "Homestead (Gharabari)",
       owner: "DEMO Owner Beta", notif: "DEMO/LA/CBA/2009/017", acqDate: "2010-03-15", comp: "Paid", rr: "Under process", emp: "Cash compensation (CC)",
       possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Orange", conf: 71, r: 1, c: 0,
       sources: [{ doc: "Award statement (DEMO)", plot: "124/356", khata: "121", name: "DEMO Owner Beta" }],
       landmarks: "Near Sample Primary School (DEMO)" },
-    { id: "KN-121-125", v: "Kaniha", khata: "121", plot: "125", areaAcq: 0.45, areaRec: 0.45, acquired: 0.45, type: "Agricultural (Bahal)",
+    { id: "DP-121-125", v: "Demopur (DEMO)", khata: "121", plot: "125", areaAcq: 0.45, areaRec: 0.45, acquired: 0.45, type: "Agricultural (Bahal)",
       owner: "DEMO Owner Beta", notif: "DEMO/LA/CBA/2009/017", acqDate: "2010-03-15", comp: "Paid", rr: "Provided", emp: "Not applicable",
       possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Yellow", conf: 84, r: 1, c: 1,
       sources: [{ doc: "Award statement (DEMO)", plot: "125", khata: "121", name: "DEMO Owner Beta" }], landmarks: "West of Sample Village Road" },
-    { id: "KN-121-126", v: "Kaniha", khata: "121", plot: "126", areaAcq: 0.38, areaRec: 0.38, acquired: 0.38, type: "Agricultural (Bahal)",
+    { id: "DP-121-126", v: "Demopur (DEMO)", khata: "121", plot: "126", areaAcq: 0.38, areaRec: 0.38, acquired: 0.38, type: "Agricultural (Bahal)",
       owner: "DEMO Owner Gamma", notif: "DEMO/LA/CBA/2011/042", acqDate: "2012-07-02", comp: "Paid", rr: "Provided", emp: "Employment provided",
       possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Blue", conf: 90, r: 1, c: 2,
       sources: [{ doc: "Award statement (DEMO)", plot: "126", khata: "121", name: "DEMO Owner Gamma" }], landmarks: "-" },
-    { id: "KN-150-240", v: "Kaniha", khata: "150", plot: "240", areaAcq: 0.95, areaRec: 0.95, acquired: 0.95, type: "Uncultivable (Anabadi)",
+    { id: "DP-150-240", v: "Demopur (DEMO)", khata: "150", plot: "240", areaAcq: 0.95, areaRec: 0.95, acquired: 0.95, type: "Uncultivable (Anabadi)",
       owner: "DEMO Owner Delta", notif: "DEMO/LA/CBA/2011/042", acqDate: "2012-07-02", comp: "Paid", rr: "Not applicable", emp: "Not applicable",
       possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Green", conf: 95, r: 0, c: 0,
       sources: [{ doc: "Award statement (DEMO)", plot: "240", khata: "150", name: "DEMO Owner Delta" }], landmarks: "Adjoining Sample Pond" },
-    { id: "KN-150-241", v: "Kaniha", khata: "150", plot: "241", areaAcq: 0.30, areaRec: 0.30, acquired: 0.30, type: "Agricultural (Sarad)",
+    { id: "DP-150-241", v: "Demopur (DEMO)", khata: "150", plot: "241", areaAcq: 0.30, areaRec: 0.30, acquired: 0.30, type: "Agricultural (Sarad)",
       owner: "DEMO Owner Delta", notif: "DEMO/LA/CBA/2011/042", acqDate: "2012-07-02", comp: "Paid", rr: "Provided", emp: "Annuity",
       possession: "Pending", demarcation: "Not started", map: "Map sheet damaged - plot line unclear", status: "Red", conf: null, r: null, c: null,
       sources: [{ doc: "Award statement (DEMO)", plot: "241", khata: "150", name: "DEMO Owner Delta" }], landmarks: "Reported near Sample Nala (unconfirmed)" },
-    { id: "TS-032-011", v: "Telisingha", khata: "32", plot: "11", areaAcq: 0.70, areaRec: 0.72, acquired: 0.70, type: "Agricultural (Sarad)",
+    { id: "SG-032-011", v: "Sampleguda (DEMO)", khata: "32", plot: "11", areaAcq: 0.70, areaRec: 0.72, acquired: 0.70, type: "Agricultural (Sarad)",
       owner: "DEMO Owner Epsilon", notif: "DEMO/LA/CBA/2014/008", acqDate: "2015-01-20", comp: "Paid", rr: "Provided", emp: "Employment provided",
       possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Yellow", conf: 68, r: 0, c: 0,
       sources: [{ doc: "Award statement (DEMO)", plot: "11", khata: "32", name: "DEMO Owner Epsilon" }], landmarks: "North of Sample Temple (DEMO)" },
-    { id: "TS-032-012", v: "Telisingha", khata: "32", plot: "12", areaAcq: 0.55, areaRec: 0.55, acquired: 0.55, type: "Agricultural (Bahal)",
+    { id: "SG-032-012", v: "Sampleguda (DEMO)", khata: "32", plot: "12", areaAcq: 0.55, areaRec: 0.55, acquired: 0.55, type: "Agricultural (Bahal)",
       owner: "DEMO Owner Epsilon", notif: "DEMO/LA/CBA/2014/008", acqDate: "2015-01-20", comp: "Paid", rr: "Provided", emp: "Cash compensation (CC)",
       possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Green", conf: 91, r: 0, c: 1,
       sources: [{ doc: "Award statement (DEMO)", plot: "12", khata: "32", name: "DEMO Owner Epsilon" }], landmarks: "-" },
-    { id: "JR-040-019", v: "Jarada", khata: "40", plot: "19", areaAcq: 1.25, areaRec: 1.25, acquired: 1.00, type: "Homestead (Gharabari)",
+    { id: "TP-040-019", v: "Testpali (DEMO)", khata: "40", plot: "19", areaAcq: 1.25, areaRec: 1.25, acquired: 1.00, type: "Homestead (Gharabari)",
       owner: "DEMO Owner Zeta", notif: "DEMO/LA/CBA/2014/008", acqDate: "2015-01-20", comp: "Partly paid", rr: "Under process", emp: "Under process",
       possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Yellow", conf: 55, r: 0, c: 0,
       sources: [{ doc: "Award statement (DEMO)", plot: "19", khata: "40", name: "DEMO Owner Zeta" }], landmarks: "Near Sample Road junction" },
-    { id: "JR-040-020", v: "Jarada", khata: "40", plot: "20", areaAcq: 0.40, areaRec: 0.40, acquired: 0.40, type: "Agricultural (Sarad)",
+    { id: "TP-040-020", v: "Testpali (DEMO)", khata: "40", plot: "20", areaAcq: 0.40, areaRec: 0.40, acquired: 0.40, type: "Agricultural (Sarad)",
       owner: "DEMO Owner Zeta", notif: "DEMO/LA/CBA/2014/008", acqDate: "2015-01-20", comp: "Paid", rr: "Provided", emp: "Annuity",
       possession: "Pending", demarcation: "Not started", map: "Not available", status: "Red", conf: null, r: null, c: null,
       sources: [{ doc: "Land record extract (DEMO)", plot: "20", khata: "40", name: "DEMO Owner Zeta" }], landmarks: "-" },
-    { id: "JR-041-021", v: "Jarada", khata: "41", plot: "21", areaAcq: 0.62, areaRec: 0.62, acquired: 0.62, type: "Agricultural (Bahal)",
+    { id: "TP-041-021", v: "Testpali (DEMO)", khata: "41", plot: "21", areaAcq: 0.62, areaRec: 0.62, acquired: 0.62, type: "Agricultural (Bahal)",
       owner: "DEMO Owner Eta", notif: "DEMO/LA/CBA/2014/008", acqDate: "2015-01-20", comp: "Paid", rr: "Provided", emp: "Employment provided",
       possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Blue", conf: 87, r: 0, c: 1,
       sources: [{ doc: "Award statement (DEMO)", plot: "21", khata: "41", name: "DEMO Owner Eta" }], landmarks: "-" },
-    { id: "PM-058-301", v: "Patharmunda", khata: "58", plot: "301", areaAcq: 0.74, areaRec: 0.74, acquired: 0.74, type: "Agricultural (Sarad)",
+    { id: "MG-058-301", v: "Mockgarh (DEMO)", khata: "58", plot: "301", areaAcq: 0.74, areaRec: 0.74, acquired: 0.74, type: "Agricultural (Sarad)",
       owner: "DEMO Owner Theta", notif: "DEMO/LA/CBA/2016/021", acqDate: "2017-02-10", comp: "Paid", rr: "Provided", emp: "Employment provided",
       possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Green", conf: 89, r: 0, c: 0,
       sources: [{ doc: "Award statement (DEMO)", plot: "301", khata: "58", name: "DEMO Owner Theta" }], landmarks: "-" },
-    { id: "PM-058-302", v: "Patharmunda", khata: "58", plot: "302", areaAcq: 0.51, areaRec: 0.51, acquired: 0.51, type: "Agricultural (Bahal)",
+    { id: "MG-058-302", v: "Mockgarh (DEMO)", khata: "58", plot: "302", areaAcq: 0.51, areaRec: 0.51, acquired: 0.51, type: "Agricultural (Bahal)",
       owner: "DEMO Owner Theta", notif: "DEMO/LA/CBA/2016/021", acqDate: "2017-02-10", comp: "Paid", rr: "Under process", emp: "Annuity",
       possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Yellow", conf: 77, r: 0, c: 1,
       sources: [{ doc: "Award statement (DEMO)", plot: "302", khata: "58", name: "DEMO Owner Theta" }], landmarks: "-" },
-    { id: "GN-012-077", v: "Gundurinali", khata: "12", plot: "77", areaAcq: 0.88, areaRec: 0.88, acquired: 0.88, type: "Agricultural (Sarad)",
+    { id: "DM-012-077", v: "Dummypada (DEMO)", khata: "12", plot: "77", areaAcq: 0.88, areaRec: 0.88, acquired: 0.88, type: "Agricultural (Sarad)",
       owner: "DEMO Owner Iota", notif: "DEMO/LA/CBA/2016/021", acqDate: "2017-02-10", comp: "Paid", rr: "Provided", emp: "Cash compensation (CC)",
       possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Orange", conf: 74, r: 0, c: 0,
       sources: [{ doc: "Award statement (DEMO)", plot: "77", khata: "13", name: "DEMO Owner Iota" }], landmarks: "-" },
-    { id: "GN-012-078", v: "Gundurinali", khata: "12", plot: "78", areaAcq: 0.33, areaRec: 0.33, acquired: 0.33, type: "Uncultivable (Anabadi)",
+    { id: "DM-012-078", v: "Dummypada (DEMO)", khata: "12", plot: "78", areaAcq: 0.33, areaRec: 0.33, acquired: 0.33, type: "Uncultivable (Anabadi)",
       owner: "DEMO Owner Iota", notif: "DEMO/LA/CBA/2016/021", acqDate: "2017-02-10", comp: "Paid", rr: "Not applicable", emp: "Not applicable",
       possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Green", conf: 93, r: 0, c: 1,
       sources: [{ doc: "Award statement (DEMO)", plot: "78", khata: "12", name: "DEMO Owner Iota" }], landmarks: "-" },
-    { id: "BG-205-410", v: "Badagunduri", khata: "205", plot: "410", areaAcq: 0.92, areaRec: 0.92, acquired: 0.92, type: "Agricultural (Bahal)",
+    { id: "PN-205-410", v: "Pilotnagar (DEMO)", khata: "205", plot: "410", areaAcq: 0.92, areaRec: 0.92, acquired: 0.92, type: "Agricultural (Bahal)",
       owner: "DEMO Owner Kappa", notif: "DEMO/LA/CBA/2018/005", acqDate: "2019-08-26", comp: "Paid", rr: "Provided", emp: "Employment provided",
       possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Blue", conf: 86, r: 0, c: 0,
       sources: [{ doc: "Award statement (DEMO)", plot: "410", khata: "205", name: "DEMO Owner Kappa" }], landmarks: "-" },
-    { id: "BG-205-411", v: "Badagunduri", khata: "205", plot: "411", areaAcq: 0.47, areaRec: 0.47, acquired: 0.47, type: "Agricultural (Sarad)",
+    { id: "PN-205-411", v: "Pilotnagar (DEMO)", khata: "205", plot: "411", areaAcq: 0.47, areaRec: 0.47, acquired: 0.47, type: "Agricultural (Sarad)",
       owner: "DEMO Owner Kappa", notif: "DEMO/LA/CBA/2018/005", acqDate: "2019-08-26", comp: "Partly paid", rr: "Under process", emp: "Under process",
       possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Yellow", conf: 63, r: 0, c: 1,
       sources: [{ doc: "Award statement (DEMO)", plot: "411", khata: "205", name: "DEMO Owner Kappa" }], landmarks: "-" },
-    { id: "BR-088-056", v: "Balrampur", khata: "88", plot: "56", areaAcq: 0.69, areaRec: 0.69, acquired: 0.69, type: "Homestead (Gharabari)",
+    { id: "TR-088-056", v: "Trialpur (DEMO)", khata: "88", plot: "56", areaAcq: 0.69, areaRec: 0.69, acquired: 0.69, type: "Homestead (Gharabari)",
       owner: "DEMO Owner Lambda", notif: "DEMO/LA/CBA/2018/005", acqDate: "2019-08-26", comp: "Paid", rr: "Provided", emp: "Employment provided",
       possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Green", conf: 90, r: 0, c: 0,
       sources: [{ doc: "Award statement (DEMO)", plot: "56", khata: "88", name: "DEMO Owner Lambda" }], landmarks: "-" },
-    { id: "BR-088-057", v: "Balrampur", khata: "88", plot: "57", areaAcq: 0.28, areaRec: 0.28, acquired: 0.28, type: "Agricultural (Sarad)",
+    { id: "TR-088-057", v: "Trialpur (DEMO)", khata: "88", plot: "57", areaAcq: 0.28, areaRec: 0.28, acquired: 0.28, type: "Agricultural (Sarad)",
       owner: "DEMO Owner Lambda", notif: "DEMO/LA/CBA/2018/005", acqDate: "2019-08-26", comp: "Paid", rr: "Provided", emp: "Annuity",
       possession: "Pending", demarcation: "Not started", map: "Map sheet missing", status: "Red", conf: null, r: null, c: null,
       sources: [{ doc: "Land record extract (DEMO)", plot: "57", khata: "88", name: "DEMO Owner Lambda" }], landmarks: "-" },
-    { id: "AP-019-140", v: "Adaitaprasad", khata: "19", plot: "140", areaAcq: 0.80, areaRec: 0.78, acquired: 0.80, type: "Agricultural (Bahal)",
+    { id: "MD-019-140", v: "Modelguda (DEMO)", khata: "19", plot: "140", areaAcq: 0.80, areaRec: 0.78, acquired: 0.80, type: "Agricultural (Bahal)",
       owner: "DEMO Owner Mu", notif: "DEMO/LA/CBA/2020/012", acqDate: "2021-04-05", comp: "Paid", rr: "Provided", emp: "Cash compensation (CC)",
       possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Yellow", conf: 70, r: 0, c: 0,
       sources: [{ doc: "Award statement (DEMO)", plot: "140", khata: "19", name: "DEMO Owner Mu" }], landmarks: "-" },
-    { id: "AP-019-141", v: "Adaitaprasad", khata: "19", plot: "141", areaAcq: 0.58, areaRec: 0.58, acquired: 0.58, type: "Agricultural (Sarad)",
+    { id: "MD-019-141", v: "Modelguda (DEMO)", khata: "19", plot: "141", areaAcq: 0.58, areaRec: 0.58, acquired: 0.58, type: "Agricultural (Sarad)",
       owner: "DEMO Owner Mu", notif: "DEMO/LA/CBA/2020/012", acqDate: "2021-04-05", comp: "Paid", rr: "Provided", emp: "Employment provided",
       possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Green", conf: 91, r: 0, c: 1,
       sources: [{ doc: "Award statement (DEMO)", plot: "141", khata: "19", name: "DEMO Owner Mu" }], landmarks: "-" }
@@ -143,27 +141,27 @@ var DEMO = (function () {
   }
   function at(village, dLat, dLng) { var o = ORIGIN[village]; return [o[0] + dLat, o[1] + dLng]; }
   var villages = Object.keys(ORIGIN).map(function (v) {
-    return { name: v, boundary: box(v, 3, v === "Kaniha" ? 4 : 3, 0.0012) };
+    return { name: v, boundary: box(v, 3, v === "Demopur (DEMO)" ? 4 : 3, 0.0012) };
   });
-  var mclLand = Object.keys(ORIGIN).map(function (v) { return box(v, v === "Kaniha" ? 2 : 1, v === "Kaniha" ? 3 : 2, 0.0002); });
+  var mclLand = Object.keys(ORIGIN).map(function (v) { return box(v, v === "Demopur (DEMO)" ? 2 : 1, v === "Demopur (DEMO)" ? 3 : 2, 0.0002); });
   var landmarks = [
-    { name: "Pond (DEMO landmark)", at: at("Kaniha", 0.0005, -0.0004) },
-    { name: "Primary School (DEMO landmark)", at: at("Kaniha", -0.0013, -0.0004) },
-    { name: "Village Road (DEMO landmark)", at: at("Kaniha", -0.0005, 0.0020) },
-    { name: "Temple (DEMO landmark)", at: at("Telisingha", -0.0006, 0.0003) },
-    { name: "Road junction (DEMO landmark)", at: at("Jarada", -0.0010, -0.0002) }
+    { name: "Pond (DEMO landmark)", at: at("Demopur (DEMO)", 0.0005, -0.0004) },
+    { name: "Primary School (DEMO landmark)", at: at("Demopur (DEMO)", -0.0013, -0.0004) },
+    { name: "Village Road (DEMO landmark)", at: at("Demopur (DEMO)", -0.0005, 0.0020) },
+    { name: "Temple (DEMO landmark)", at: at("Sampleguda (DEMO)", -0.0006, 0.0003) },
+    { name: "Road junction (DEMO landmark)", at: at("Testpali (DEMO)", -0.0010, -0.0002) }
   ];
   // Ground control points used by the (simulated) georeferencing step
   var controlPoints = [
-    { name: "GCP-1 Road culvert (DEMO)", at: at("Kaniha", 0.0003, -0.0001) },
-    { name: "GCP-2 Pond corner (DEMO)", at: at("Kaniha", 0, -0.0004) },
-    { name: "GCP-3 Survey pillar (DEMO)", at: at("Kaniha", -0.0011, 0.0014) }
+    { name: "GCP-1 Road culvert (DEMO)", at: at("Demopur (DEMO)", 0.0003, -0.0001) },
+    { name: "GCP-2 Pond corner (DEMO)", at: at("Demopur (DEMO)", 0, -0.0004) },
+    { name: "GCP-3 Survey pillar (DEMO)", at: at("Demopur (DEMO)", -0.0011, 0.0014) }
   ];
 
   // Text an OCR engine could return for the sample old map (used by "Try the sample map")
   var sampleOcrText =
     "GOVT. OF ODISHA (DEMO)  ACQUISITION MAP - SHEET 3\n" +
-    "Mouza: Kaniha   Tahasil: Kaniha   Dist: Angul\n" +
+    "Mouza: Demopur (DEMO)   Tahasil: Kaniha   Dist: Angul\n" +
     "Notification No. DEMO/LA/CBA/2009/017  Dated 15-03-2010\n" +
     "Khata No. 145   Plot No. 234   Area 0.82 Ac.\n" +
     "Khata No. 145   Plot No. 235   Area 0.64 Ac.\n" +
