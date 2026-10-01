@@ -179,7 +179,9 @@
   var map = null, layers = {}, hi = null, measure = null, gpsMarker = null, verifyLayer = null;
   function initMap() {
     if (!window.L) { L0.showMsg("#page-msg", "err", "The map library did not load. Check the internet connection.", "Leaflet not available"); return; }
-    map = L.map("map", { zoomControl: true }).setView([21.0928, 85.1090], 17);
+    // The map is locked to the Kaniha Area site: no panning or zooming out beyond it
+    map = L.map("map", { zoomControl: true, maxBounds: DEMO.siteBounds, maxBoundsViscosity: 1.0, minZoom: 14 })
+      .setView(DEMO.site, 15);
     var streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap contributors" });
     var sat = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "Imagery © Esri" });
     sat.addTo(map);
@@ -795,21 +797,29 @@
   }
   $all(".tabs button").forEach(function (b) { b.onclick = function () { showTab(b.getAttribute("data-tab")); }; });
   $("#m-gps").onclick = function () {
-    getGPS(function (g) { showGps(g); map.setView([g.lat, g.lng], 17); },
+    getGPS(function (g) {
+      showGps(g);
+      if (L.latLngBounds(DEMO.siteBounds).contains([g.lat, g.lng])) map.setView([g.lat, g.lng], 17);
+      else L0.showMsg("#m-measure-out", "warn", "You are outside the Kaniha Area site, so the map stays on the site.");
+    },
       function (m) { L0.showMsg("#m-measure-out", "warn", "Could not get your location: " + m); });
   };
   $("#m-measure").onclick = function () { if (map) toggleMeasure(); };
   $("#m-fit").onclick = fitAll;
 
   window.FIELD = { select: select };
-  initMap(); fitAll(); lockCards();
+  initMap(); fitAll();
   var tab = (location.hash || "#find").slice(1);
   showTab(["find", "ai", "verify"].indexOf(tab) !== -1 ? tab : "find");
-  refresh().then(function () {
-    var pid = params.get("plot");
-    if (pid && byId(pid)) { select(pid); if (tab === "verify" && $("#v-plot")) { $("#v-plot").value = pid; showTab("verify"); } }
+  // Officer tools appear only after the login check has finished
+  L0.ready.then(function () {
+    lockCards();
+    refresh().then(function () {
+      var pid = params.get("plot");
+      if (pid && byId(pid)) { select(pid); if (tab === "verify" && $("#v-plot")) { $("#v-plot").value = pid; showTab("verify"); } }
+    });
+    loadGrievances();
   });
-  loadGrievances();
 })();
 </script>
 </body>

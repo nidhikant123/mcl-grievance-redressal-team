@@ -3,9 +3,19 @@
 // Boundaries are drawn on a synthetic grid; they are NOT real parcels or real MCL land.
 
 var DEMO = (function () {
-  var TAHASIL = "Kaniha (DEMO)", DISTRICT = "Angul (DEMO)";
+  var TAHASIL = "Kaniha", DISTRICT = "Angul";
   // Synthetic grid origin (not a surveyed location)
-  var ORIGIN = { "Demopur (DEMO)": [21.0950, 85.1050], "Sampleguda (DEMO)": [21.0905, 85.1135] };
+  // Site reference point given by the team (Kaniha Area). The demo villages are laid
+  // out around it on a synthetic grid; their positions are NOT real village locations.
+  var SITE = [21.079030, 85.041853];
+  // Offsets (degrees) of each demo village's grid corner from the site point
+  var OFFSET = {
+    "Demopur (DEMO)": [0.0028, -0.0073], "Sampleguda (DEMO)": [-0.0017, 0.0012], "Testpali (DEMO)": [-0.0017, -0.0063],
+    "Mockgarh (DEMO)": [0.0068, -0.0003], "Dummypada (DEMO)": [-0.0062, -0.0073], "Pilotnagar (DEMO)": [-0.0062, 0.0017],
+    "Trialpur (DEMO)": [0.0078, -0.0093], "Modelguda (DEMO)": [0.0028, 0.0077]
+  };
+  var ORIGIN = {};
+  Object.keys(OFFSET).forEach(function (v) { ORIGIN[v] = [SITE[0] + OFFSET[v][0], SITE[1] + OFFSET[v][1]]; });
   var CELL_LAT = 0.00052, CELL_LNG = 0.00056; // about 58 m x 58 m (~0.83 acre)
 
   // Deterministic small jitter so plots look hand-drawn rather than a perfect grid
@@ -61,18 +71,58 @@ var DEMO = (function () {
       owner: "DEMO Owner Epsilon", notif: "DEMO/LA/CBA/2014/008", acqDate: "2015-01-20", comp: "Paid", rr: "Provided", emp: "Cash compensation (CC)",
       possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Green", conf: 91, r: 0, c: 1,
       sources: [{ doc: "Award statement (DEMO)", plot: "12", khata: "32", name: "DEMO Owner Epsilon" }], landmarks: "-" },
-    { id: "SG-040-019", v: "Sampleguda (DEMO)", khata: "40", plot: "19", areaAcq: 1.25, areaRec: 1.25, acquired: 1.00, type: "Homestead (Gharabari)",
+    { id: "TP-040-019", v: "Testpali (DEMO)", khata: "40", plot: "19", areaAcq: 1.25, areaRec: 1.25, acquired: 1.00, type: "Homestead (Gharabari)",
       owner: "DEMO Owner Zeta", notif: "DEMO/LA/CBA/2014/008", acqDate: "2015-01-20", comp: "Partly paid", rr: "Under process", emp: "Under process",
-      possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Yellow", conf: 55, r: 1, c: 0,
+      possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Yellow", conf: 55, r: 0, c: 0,
       sources: [{ doc: "Award statement (DEMO)", plot: "19", khata: "40", name: "DEMO Owner Zeta" }], landmarks: "Near Sample Road junction" },
-    { id: "SG-040-020", v: "Sampleguda (DEMO)", khata: "40", plot: "20", areaAcq: 0.40, areaRec: 0.40, acquired: 0.40, type: "Agricultural (Sarad)",
+    { id: "TP-040-020", v: "Testpali (DEMO)", khata: "40", plot: "20", areaAcq: 0.40, areaRec: 0.40, acquired: 0.40, type: "Agricultural (Sarad)",
       owner: "DEMO Owner Zeta", notif: "DEMO/LA/CBA/2014/008", acqDate: "2015-01-20", comp: "Paid", rr: "Provided", emp: "Annuity",
       possession: "Pending", demarcation: "Not started", map: "Not available", status: "Red", conf: null, r: null, c: null,
       sources: [{ doc: "Land record extract (DEMO)", plot: "20", khata: "40", name: "DEMO Owner Zeta" }], landmarks: "-" },
-    { id: "SG-041-021", v: "Sampleguda (DEMO)", khata: "41", plot: "21", areaAcq: 0.62, areaRec: 0.62, acquired: 0.62, type: "Agricultural (Bahal)",
+    { id: "TP-041-021", v: "Testpali (DEMO)", khata: "41", plot: "21", areaAcq: 0.62, areaRec: 0.62, acquired: 0.62, type: "Agricultural (Bahal)",
       owner: "DEMO Owner Eta", notif: "DEMO/LA/CBA/2014/008", acqDate: "2015-01-20", comp: "Paid", rr: "Provided", emp: "Employment provided",
-      possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Blue", conf: 87, r: 1, c: 1,
-      sources: [{ doc: "Award statement (DEMO)", plot: "21", khata: "41", name: "DEMO Owner Eta" }], landmarks: "-" }
+      possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Blue", conf: 87, r: 0, c: 1,
+      sources: [{ doc: "Award statement (DEMO)", plot: "21", khata: "41", name: "DEMO Owner Eta" }], landmarks: "-" },
+    { id: "MG-058-301", v: "Mockgarh (DEMO)", khata: "58", plot: "301", areaAcq: 0.74, areaRec: 0.74, acquired: 0.74, type: "Agricultural (Sarad)",
+      owner: "DEMO Owner Theta", notif: "DEMO/LA/CBA/2016/021", acqDate: "2017-02-10", comp: "Paid", rr: "Provided", emp: "Employment provided",
+      possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Green", conf: 89, r: 0, c: 0,
+      sources: [{ doc: "Award statement (DEMO)", plot: "301", khata: "58", name: "DEMO Owner Theta" }], landmarks: "-" },
+    { id: "MG-058-302", v: "Mockgarh (DEMO)", khata: "58", plot: "302", areaAcq: 0.51, areaRec: 0.51, acquired: 0.51, type: "Agricultural (Bahal)",
+      owner: "DEMO Owner Theta", notif: "DEMO/LA/CBA/2016/021", acqDate: "2017-02-10", comp: "Paid", rr: "Under process", emp: "Annuity",
+      possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Yellow", conf: 77, r: 0, c: 1,
+      sources: [{ doc: "Award statement (DEMO)", plot: "302", khata: "58", name: "DEMO Owner Theta" }], landmarks: "-" },
+    { id: "DM-012-077", v: "Dummypada (DEMO)", khata: "12", plot: "77", areaAcq: 0.88, areaRec: 0.88, acquired: 0.88, type: "Agricultural (Sarad)",
+      owner: "DEMO Owner Iota", notif: "DEMO/LA/CBA/2016/021", acqDate: "2017-02-10", comp: "Paid", rr: "Provided", emp: "Cash compensation (CC)",
+      possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Orange", conf: 74, r: 0, c: 0,
+      sources: [{ doc: "Award statement (DEMO)", plot: "77", khata: "13", name: "DEMO Owner Iota" }], landmarks: "-" },
+    { id: "DM-012-078", v: "Dummypada (DEMO)", khata: "12", plot: "78", areaAcq: 0.33, areaRec: 0.33, acquired: 0.33, type: "Uncultivable (Anabadi)",
+      owner: "DEMO Owner Iota", notif: "DEMO/LA/CBA/2016/021", acqDate: "2017-02-10", comp: "Paid", rr: "Not applicable", emp: "Not applicable",
+      possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Green", conf: 93, r: 0, c: 1,
+      sources: [{ doc: "Award statement (DEMO)", plot: "78", khata: "12", name: "DEMO Owner Iota" }], landmarks: "-" },
+    { id: "PN-205-410", v: "Pilotnagar (DEMO)", khata: "205", plot: "410", areaAcq: 0.92, areaRec: 0.92, acquired: 0.92, type: "Agricultural (Bahal)",
+      owner: "DEMO Owner Kappa", notif: "DEMO/LA/CBA/2018/005", acqDate: "2019-08-26", comp: "Paid", rr: "Provided", emp: "Employment provided",
+      possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Blue", conf: 86, r: 0, c: 0,
+      sources: [{ doc: "Award statement (DEMO)", plot: "410", khata: "205", name: "DEMO Owner Kappa" }], landmarks: "-" },
+    { id: "PN-205-411", v: "Pilotnagar (DEMO)", khata: "205", plot: "411", areaAcq: 0.47, areaRec: 0.47, acquired: 0.47, type: "Agricultural (Sarad)",
+      owner: "DEMO Owner Kappa", notif: "DEMO/LA/CBA/2018/005", acqDate: "2019-08-26", comp: "Partly paid", rr: "Under process", emp: "Under process",
+      possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Yellow", conf: 63, r: 0, c: 1,
+      sources: [{ doc: "Award statement (DEMO)", plot: "411", khata: "205", name: "DEMO Owner Kappa" }], landmarks: "-" },
+    { id: "TR-088-056", v: "Trialpur (DEMO)", khata: "88", plot: "56", areaAcq: 0.69, areaRec: 0.69, acquired: 0.69, type: "Homestead (Gharabari)",
+      owner: "DEMO Owner Lambda", notif: "DEMO/LA/CBA/2018/005", acqDate: "2019-08-26", comp: "Paid", rr: "Provided", emp: "Employment provided",
+      possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Green", conf: 90, r: 0, c: 0,
+      sources: [{ doc: "Award statement (DEMO)", plot: "56", khata: "88", name: "DEMO Owner Lambda" }], landmarks: "-" },
+    { id: "TR-088-057", v: "Trialpur (DEMO)", khata: "88", plot: "57", areaAcq: 0.28, areaRec: 0.28, acquired: 0.28, type: "Agricultural (Sarad)",
+      owner: "DEMO Owner Lambda", notif: "DEMO/LA/CBA/2018/005", acqDate: "2019-08-26", comp: "Paid", rr: "Provided", emp: "Annuity",
+      possession: "Pending", demarcation: "Not started", map: "Map sheet missing", status: "Red", conf: null, r: null, c: null,
+      sources: [{ doc: "Land record extract (DEMO)", plot: "57", khata: "88", name: "DEMO Owner Lambda" }], landmarks: "-" },
+    { id: "MD-019-140", v: "Modelguda (DEMO)", khata: "19", plot: "140", areaAcq: 0.80, areaRec: 0.78, acquired: 0.80, type: "Agricultural (Bahal)",
+      owner: "DEMO Owner Mu", notif: "DEMO/LA/CBA/2020/012", acqDate: "2021-04-05", comp: "Paid", rr: "Provided", emp: "Cash compensation (CC)",
+      possession: "Pending", demarcation: "Pending", map: "Scanned acquisition map (1:4000, DEMO)", status: "Yellow", conf: 70, r: 0, c: 0,
+      sources: [{ doc: "Award statement (DEMO)", plot: "140", khata: "19", name: "DEMO Owner Mu" }], landmarks: "-" },
+    { id: "MD-019-141", v: "Modelguda (DEMO)", khata: "19", plot: "141", areaAcq: 0.58, areaRec: 0.58, acquired: 0.58, type: "Agricultural (Sarad)",
+      owner: "DEMO Owner Mu", notif: "DEMO/LA/CBA/2020/012", acqDate: "2021-04-05", comp: "Paid", rr: "Provided", emp: "Employment provided",
+      possession: "Completed", demarcation: "Completed", map: "Scanned acquisition map (1:4000, DEMO)", status: "Green", conf: 91, r: 0, c: 1,
+      sources: [{ doc: "Award statement (DEMO)", plot: "141", khata: "19", name: "DEMO Owner Mu" }], landmarks: "-" }
   ];
 
   var plots = raw.map(function (p, i) {
@@ -95,23 +145,23 @@ var DEMO = (function () {
     return [[o[0] + pad, o[1] - pad], [o[0] + pad, o[1] + cols * CELL_LNG + pad],
             [o[0] - rows * CELL_LAT - pad, o[1] + cols * CELL_LNG + pad], [o[0] - rows * CELL_LAT - pad, o[1] - pad]];
   }
-  var villages = [
-    { name: "Demopur (DEMO)", boundary: box("Demopur (DEMO)", 3, 4, 0.0012) },
-    { name: "Sampleguda (DEMO)", boundary: box("Sampleguda (DEMO)", 3, 3, 0.0012) }
-  ];
-  var mclLand = [box("Demopur (DEMO)", 2, 3, 0.0002), box("Sampleguda (DEMO)", 2, 2, 0.0002)];
+  function at(village, dLat, dLng) { var o = ORIGIN[village]; return [o[0] + dLat, o[1] + dLng]; }
+  var villages = Object.keys(ORIGIN).map(function (v) {
+    return { name: v, boundary: box(v, 3, v === "Demopur (DEMO)" ? 4 : 3, 0.0012) };
+  });
+  var mclLand = Object.keys(ORIGIN).map(function (v) { return box(v, v === "Demopur (DEMO)" ? 2 : 1, v === "Demopur (DEMO)" ? 3 : 2, 0.0002); });
   var landmarks = [
-    { name: "Sample Pond (DEMO)", at: [21.0955, 85.1046] },
-    { name: "Sample Primary School (DEMO)", at: [21.0937, 85.1046] },
-    { name: "Sample Village Road (DEMO)", at: [21.0945, 85.1070] },
-    { name: "Sample Temple (DEMO)", at: [21.0899, 85.1138] },
-    { name: "Sample Road junction (DEMO)", at: [21.0892, 85.1133] }
+    { name: "Pond (DEMO landmark)", at: at("Demopur (DEMO)", 0.0005, -0.0004) },
+    { name: "Primary School (DEMO landmark)", at: at("Demopur (DEMO)", -0.0013, -0.0004) },
+    { name: "Village Road (DEMO landmark)", at: at("Demopur (DEMO)", -0.0005, 0.0020) },
+    { name: "Temple (DEMO landmark)", at: at("Sampleguda (DEMO)", -0.0006, 0.0003) },
+    { name: "Road junction (DEMO landmark)", at: at("Testpali (DEMO)", -0.0010, -0.0002) }
   ];
   // Ground control points used by the (simulated) georeferencing step
   var controlPoints = [
-    { name: "GCP-1 Road culvert (DEMO)", at: [21.0953, 85.1049] },
-    { name: "GCP-2 Pond corner (DEMO)", at: [21.0950, 85.1046] },
-    { name: "GCP-3 Survey pillar (DEMO)", at: [21.0939, 85.1064] }
+    { name: "GCP-1 Road culvert (DEMO)", at: at("Demopur (DEMO)", 0.0003, -0.0001) },
+    { name: "GCP-2 Pond corner (DEMO)", at: at("Demopur (DEMO)", 0, -0.0004) },
+    { name: "GCP-3 Survey pillar (DEMO)", at: at("Demopur (DEMO)", -0.0011, 0.0014) }
   ];
 
   // Text an OCR engine could return for the sample old map (used by "Try the sample map")
@@ -125,6 +175,12 @@ var DEMO = (function () {
     "Recorded tenant: DEMO Owner Alpha\n" +
     "Scale 1:4000   Land acquired for Coal Block (DEMO)";
 
-  return { plots: plots, villages: villages, mclLand: mclLand, landmarks: landmarks, controlPoints: controlPoints,
+  // The map may only show this area: all villages plus about 1 km around them
+  var allPts = [SITE]; villages.forEach(function (v) { allPts = allPts.concat(v.boundary); });
+  var lats = allPts.map(function (x) { return x[0]; }), lngs = allPts.map(function (x) { return x[1]; });
+  var siteBounds = [[Math.min.apply(null, lats) - 0.009, Math.min.apply(null, lngs) - 0.009],
+                    [Math.max.apply(null, lats) + 0.009, Math.max.apply(null, lngs) + 0.009]];
+
+  return { site: SITE, siteBounds: siteBounds, plots: plots, villages: villages, mclLand: mclLand, landmarks: landmarks, controlPoints: controlPoints,
            sampleOcrText: sampleOcrText, CELL_LAT: CELL_LAT, CELL_LNG: CELL_LNG };
 })();

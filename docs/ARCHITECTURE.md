@@ -86,12 +86,13 @@ Similar names are flagged for manual checking and never treated as the same pers
 
 ### Known limits of the demo, stated honestly
 
-1. **No real officer authentication.** The dashboard uses a demo role picker.
-   Anyone with the link can open it. **This is acceptable only because all data
-   is fictional.** Production must use the authentication design in section 2.3.
-2. **The table is readable through the public API key** (team rule: anon SELECT).
-   The tracking page shows only public fields, but a technical user could read
-   raw rows. Again, this is acceptable only with fictional data.
+1. **Officer login uses Supabase accounts (email + password).** Since
+   `database/02-officer-login.sql`, only logged-in users can read grievances or
+   change records; this is enforced by the database. Citizens register, track and
+   file representations only through safe functions. **Roles are still chosen by
+   the officer after login (demo-level)**, and there is no OTP or PIN yet.
+2. Plot updates (status, GPS points, field photos) remain readable by anyone,
+   because the public map shows plot status.
 3. Files: only file names are stored. Field photos are stored as small
    compressed images inside the record.
 4. Plot boundaries are drawn on a synthetic grid near the Kaniha area. **They are

@@ -7,37 +7,59 @@
   <meta name="description" content="MCL Land & Revenue Management & Grievance Redressal System - demonstration prototype with sample data.">
   <link rel="stylesheet" href="style.css">
   <style>
-    .hero { background: linear-gradient(135deg, #0b3d6b, #135a9c); color: #fff; border-radius: 16px; padding: 22px; margin-bottom: 16px; }
-    .hero h1 { font-size: 1.5rem; }
-    .hero p { opacity: .92; max-width: 820px; }
-    .flow { display: flex; flex-wrap: wrap; gap: 6px; font-size: .85rem; margin-top: 10px; }
-    .flow span { background: rgba(255,255,255,.14); border-radius: 999px; padding: 4px 10px; }
+    /* Full-screen hero, space-industry style */
+    body.on-home main { max-width: none; padding: 0; }
+    .home { position: relative; min-height: calc(100vh - 110px); display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 48px 6vw 56px; overflow: hidden;
+            background: radial-gradient(ellipse at 70% 30%, #1b2430 0%, #07090c 55%, #000 100%); }
+    .home .topo { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; opacity: .09; pointer-events: none; }
+    .home::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.85) 100%); pointer-events: none; }
+    .home > * { position: relative; z-index: 1; }
+    .home .org { font-family: var(--display); font-size: .9rem; letter-spacing: .3em; text-transform: uppercase; color: #c8cbd0; }
+    .home h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.6rem, 7vw, 5.4rem); line-height: .95; letter-spacing: .02em;
+               text-transform: uppercase; color: #fff; margin: 14px 0 36px; max-width: 900px; }
+    .menu { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 980px; }
+    @media (max-width: 720px) { .menu { grid-template-columns: minmax(0, 1fr); } .home { padding: 36px 16px 40px; } }
+    .tile {
+      display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 12px 18px; text-decoration: none;
+      color: #fff; border: 2px solid rgba(255, 255, 255, .85); background: rgba(0, 0, 0, .25);
+      font-family: var(--display); text-transform: uppercase; letter-spacing: .14em; transition: background .2s, color .2s;
+    }
+    .tile:hover, .tile:focus-visible { background: #fff; color: #000; }
+    .tile .ico { display: inline-flex; flex: none; }
+    .tile .ico svg { width: 22px; height: 22px; }
+    .tile b { font-weight: 600; font-size: 1rem; }
+    .tile .arr { margin-left: auto; font-size: 1.1rem; }
+    .tile.primary { background: #fff; color: #000; }
+    .tile.primary:hover { background: transparent; color: #fff; }
+    .back { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-bottom: 8px; font-weight: 600; text-decoration: none; }
+    body.on-home .site-footer { display: none; }
     .ref-box { font-size: 1.5rem; font-weight: 800; letter-spacing: .04em; background: var(--bg); border: 2px dashed var(--brand-2); border-radius: 10px; padding: 10px 14px; display: inline-block; margin: 6px 0 10px; word-break: break-all; }
     .notice { border-left: 4px solid var(--brand-2); padding: 4px 12px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
 <main>
-  <section class="hero">
-    <h1 data-i18n="hero_title"></h1>
-    <p data-i18n="hero_text"></p>
-    <div class="flow">
-      <span data-i18n="f1"></span><span>→</span><span data-i18n="f2"></span><span>→</span><span data-i18n="f3"></span><span>→</span><span data-i18n="f4"></span><span>→</span><span data-i18n="f5"></span>
-    </div>
-  </section>
-
-  <section class="big-actions" aria-label="Main services">
-    <a class="big-action" href="field.html#find"><div class="ic">🔎</div><div><b data-i18n="b_find"></b><span data-i18n="b_find_s"></span></div></a>
-    <a class="big-action" href="field.html#verify"><div class="ic">📍</div><div><b data-i18n="b_field"></b><span data-i18n="b_field_s"></span></div></a>
-    <a class="big-action" href="#register"><div class="ic">📝</div><div><b data-i18n="b_reg"></b><span data-i18n="b_reg_s"></span></div></a>
-    <a class="big-action" href="#track"><div class="ic">📊</div><div><b data-i18n="b_track"></b><span data-i18n="b_track_s"></span></div></a>
-    <a class="big-action officer" href="dashboard.html"><div class="ic">🏢</div><div><b data-i18n="b_off"></b><span data-i18n="b_off_s"></span></div></a>
+  <!-- ================= HOME: main menu only ================= -->
+  <section id="view-home" class="home view">
+    <svg class="topo" viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="1"><path d="M1041 260 L1040 264 L1038 268 L1034 271 L1029 273 L1024 275 L1019 277 L1015 278 L1012 280 L1009 281 L1007 284 L1005 287 L1004 290 L1001 294 L999 298 L995 301 L990 304 L985 305 L980 306 L975 306 L969 305 L964 303 L960 302 L955 300 L951 297 L947 295 L943 293 L939 290 L936 287 L934 284 L932 280 L932 277 L932 273 L934 269 L935 266 L936 263 L937 260 L937 257 L936 254 L935 251 L933 247 L931 243 L930 239 L931 234 L932 230 L935 227 L940 224 L945 223 L950 222 L956 222 L962 222 L967 223 L971 223 L976 224 L980 224 L984 223 L989 223 L994 223 L998 223 L1003 223 L1007 225 L1011 227 L1015 229 L1018 232 L1021 234 L1024 237 L1027 240 L1030 243 L1034 246 L1037 249 L1039 252 L1041 256 L1041 260Z"/><path d="M1102 260 L1100 268 L1094 275 L1087 281 L1077 286 L1067 290 L1057 293 L1049 296 L1042 299 L1037 302 L1033 307 L1030 313 L1027 321 L1023 328 L1017 336 L1010 343 L1001 348 L991 352 L980 353 L969 352 L959 350 L949 347 L939 343 L931 339 L922 334 L914 330 L906 325 L899 320 L893 314 L888 308 L885 301 L884 293 L885 286 L886 279 L889 272 L891 266 L892 260 L892 254 L890 248 L887 242 L884 234 L881 226 L880 217 L881 208 L884 201 L891 194 L900 189 L910 186 L922 185 L933 186 L944 187 L954 188 L963 189 L972 189 L980 189 L989 188 L998 186 L1007 185 L1017 185 L1026 186 L1036 189 L1044 192 L1052 197 L1058 202 L1065 207 L1071 213 L1077 219 L1083 224 L1089 231 L1095 237 L1099 244 L1102 252 L1102 260Z"/><path d="M1163 260 L1158 272 L1150 282 L1138 291 L1123 299 L1109 304 L1094 309 L1082 313 L1072 317 L1065 323 L1060 331 L1056 340 L1051 351 L1045 363 L1037 375 L1025 385 L1012 393 L996 398 L980 400 L964 399 L948 395 L933 389 L920 383 L907 376 L894 370 L883 363 L871 356 L860 349 L851 340 L844 331 L838 321 L836 310 L836 299 L838 288 L841 278 L843 269 L844 260 L843 251 L841 242 L837 232 L832 220 L829 208 L828 195 L830 182 L836 171 L847 161 L861 155 L877 151 L895 150 L912 151 L928 154 L942 156 L956 157 L968 157 L980 156 L993 154 L1006 151 L1020 149 L1035 148 L1050 149 L1064 152 L1078 157 L1090 163 L1100 171 L1110 179 L1119 188 L1128 197 L1137 206 L1146 215 L1154 226 L1160 237 L1163 248 L1163 260Z"/><path d="M1222 260 L1216 275 L1204 289 L1188 301 L1169 311 L1149 318 L1131 325 L1115 330 L1103 336 L1094 344 L1088 355 L1082 368 L1076 383 L1068 399 L1056 415 L1041 429 L1023 439 L1002 445 L980 447 L958 444 L937 439 L918 431 L900 422 L884 413 L868 404 L853 395 L838 386 L823 376 L810 365 L800 354 L792 340 L788 326 L786 312 L788 298 L790 285 L792 272 L793 260 L792 248 L788 235 L783 221 L778 206 L774 189 L774 172 L779 156 L789 141 L804 129 L823 121 L845 117 L869 117 L891 119 L912 122 L931 125 L948 127 L964 127 L980 124 L996 121 L1014 116 L1033 112 L1054 110 L1074 110 L1094 114 L1113 120 L1129 128 L1144 139 L1157 150 L1169 162 L1181 174 L1192 187 L1203 200 L1213 214 L1220 229 L1223 244 L1222 260Z"/><path d="M1281 260 L1272 279 L1257 296 L1237 311 L1214 323 L1190 333 L1168 340 L1149 348 L1134 356 L1124 366 L1116 380 L1109 397 L1102 416 L1091 437 L1076 456 L1057 473 L1034 485 L1007 492 L980 493 L953 489 L927 481 L904 471 L882 459 L862 447 L843 436 L824 425 L805 414 L787 403 L771 390 L756 376 L746 360 L739 343 L736 326 L736 309 L737 292 L739 276 L739 260 L737 244 L733 228 L727 210 L722 190 L719 170 L720 149 L727 129 L741 111 L761 98 L786 89 L815 85 L844 85 L872 89 L898 93 L921 97 L942 99 L961 98 L980 94 L1000 88 L1022 82 L1047 76 L1073 72 L1099 71 L1124 75 L1148 82 L1169 93 L1188 106 L1205 120 L1220 136 L1234 151 L1248 168 L1260 184 L1271 202 L1279 221 L1283 240 L1281 260Z"/><path d="M1338 260 L1327 282 L1309 303 L1286 321 L1259 335 L1231 347 L1206 357 L1184 366 L1167 376 L1155 390 L1146 407 L1138 427 L1129 451 L1115 475 L1097 498 L1073 517 L1045 531 L1013 539 L980 539 L948 533 L918 522 L890 508 L865 494 L842 479 L820 466 L798 453 L775 441 L753 428 L732 414 L714 398 L699 380 L689 360 L683 340 L681 319 L681 299 L682 279 L682 260 L679 240 L674 220 L668 198 L663 175 L661 150 L664 125 L675 102 L693 82 L719 67 L750 57 L785 54 L820 55 L854 60 L884 65 L911 70 L935 72 L958 70 L980 65 L1004 56 L1031 47 L1060 39 L1092 33 L1124 32 L1155 35 L1184 44 L1211 56 L1233 72 L1253 90 L1271 109 L1287 129 L1303 148 L1317 169 L1329 191 L1338 213 L1341 237 L1338 260Z"/><path d="M1394 260 L1381 286 L1361 310 L1335 330 L1305 348 L1274 361 L1245 373 L1221 385 L1202 398 L1188 414 L1178 435 L1168 459 L1157 487 L1140 515 L1118 541 L1090 563 L1056 578 L1018 585 L980 583 L943 575 L908 561 L877 544 L849 526 L823 509 L798 493 L773 479 L747 466 L720 452 L695 437 L672 420 L653 400 L639 378 L629 355 L625 330 L623 307 L622 283 L621 260 L618 237 L613 212 L607 186 L603 158 L602 130 L609 101 L623 75 L646 53 L678 36 L715 26 L756 23 L797 26 L836 32 L871 39 L902 44 L929 46 L954 43 L980 36 L1008 25 L1039 12 L1074 1 L1111 -6 L1149 -9 L1187 -5 L1221 5 L1252 20 L1279 39 L1302 60 L1322 83 L1340 106 L1357 130 L1372 154 L1385 180 L1394 206 L1398 233 L1394 260Z"/><path d="M1448 260 L1435 289 L1413 317 L1384 340 L1351 360 L1318 377 L1286 391 L1260 405 L1239 421 L1224 441 L1212 465 L1200 493 L1186 524 L1166 556 L1140 585 L1106 609 L1067 624 L1024 630 L980 627 L938 615 L900 598 L865 577 L835 556 L806 536 L778 519 L750 504 L720 490 L689 476 L659 460 L630 441 L606 420 L587 396 L574 369 L566 342 L562 315 L560 287 L558 260 L554 232 L549 204 L544 173 L541 142 L543 109 L552 77 L571 48 L600 24 L637 6 L681 -4 L728 -6 L776 -2 L820 5 L859 13 L893 19 L923 20 L951 16 L980 6 L1012 -8 L1047 -23 L1087 -37 L1131 -47 L1175 -50 L1218 -46 L1259 -35 L1294 -17 L1324 5 L1350 30 L1372 57 L1391 84 L1409 112 L1426 140 L1439 169 L1449 199 L1452 229 L1448 260Z"/><path d="M1501 260 L1487 293 L1464 323 L1434 350 L1399 373 L1363 392 L1330 410 L1301 427 L1279 446 L1262 469 L1248 497 L1234 529 L1217 564 L1194 599 L1162 631 L1123 655 L1078 671 L1029 675 L980 669 L934 654 L891 632 L854 608 L821 584 L790 561 L760 542 L728 526 L694 512 L659 498 L623 482 L589 463 L559 440 L535 414 L517 385 L506 354 L499 323 L495 291 L492 260 L488 228 L484 195 L480 161 L479 125 L483 88 L496 53 L520 21 L554 -5 L597 -23 L648 -33 L701 -35 L754 -30 L803 -21 L846 -12 L884 -6 L917 -5 L948 -12 L980 -24 L1016 -41 L1056 -60 L1102 -76 L1151 -88 L1201 -92 L1251 -87 L1296 -74 L1335 -54 L1369 -28 L1397 1 L1420 32 L1440 63 L1459 95 L1476 126 L1491 159 L1501 192 L1505 226 L1501 260Z"/><path d="M1552 260 L1538 296 L1515 330 L1484 360 L1448 386 L1411 409 L1376 429 L1346 450 L1322 473 L1303 499 L1287 531 L1271 567 L1250 606 L1222 644 L1185 677 L1140 702 L1089 717 L1034 719 L980 709 L929 690 L884 665 L844 636 L809 609 L776 584 L743 564 L708 547 L670 533 L630 520 L588 504 L547 484 L511 461 L481 432 L459 401 L444 366 L434 331 L429 296 L425 260 L421 224 L417 187 L415 148 L416 108 L424 68 L441 29 L469 -5 L509 -33 L558 -52 L615 -62 L675 -63 L733 -57 L787 -47 L834 -38 L874 -32 L910 -32 L945 -41 L980 -56 L1020 -76 L1065 -98 L1116 -117 L1172 -130 L1228 -134 L1283 -129 L1333 -113 L1376 -90 L1412 -60 L1442 -27 L1466 8 L1487 43 L1506 78 L1524 113 L1539 149 L1550 186 L1555 223 L1552 260Z"/><path d="M1601 260 L1589 299 L1567 337 L1536 370 L1500 400 L1462 426 L1425 451 L1394 475 L1368 501 L1347 532 L1328 568 L1309 608 L1283 649 L1251 690 L1208 724 L1157 750 L1100 763 L1039 762 L980 749 L925 725 L876 695 L834 663 L797 632 L763 605 L728 584 L690 567 L647 554 L601 541 L553 525 L506 506 L463 481 L427 451 L399 417 L380 379 L368 340 L361 300 L357 260 L353 219 L351 178 L350 135 L354 91 L365 48 L386 6 L419 -31 L465 -60 L520 -81 L583 -91 L648 -91 L712 -84 L770 -74 L821 -64 L865 -59 L904 -61 L941 -71 L980 -90 L1024 -113 L1075 -138 L1132 -159 L1193 -173 L1255 -178 L1316 -170 L1370 -152 L1416 -125 L1454 -91 L1484 -54 L1509 -14 L1530 25 L1549 63 L1567 102 L1584 140 L1596 180 L1603 220 L1601 260Z"/><path d="M350 560 L347 563 L344 566 L341 568 L339 570 L337 573 L336 575 L335 578 L335 582 L334 585 L333 589 L331 593 L328 596 L324 599 L320 600 L315 601 L310 601 L305 600 L300 598 L296 596 L292 595 L288 593 L285 592 L281 590 L278 589 L274 587 L271 585 L269 583 L267 581 L265 578 L264 576 L262 573 L261 570 L259 568 L257 566 L255 563 L252 560 L249 557 L246 553 L244 549 L244 545 L245 541 L248 538 L252 535 L256 533 L262 532 L268 531 L273 531 L278 531 L282 531 L286 531 L289 530 L293 529 L296 528 L300 527 L304 526 L308 525 L312 526 L316 526 L320 528 L324 529 L327 531 L331 533 L334 535 L337 537 L341 539 L344 541 L348 544 L350 546 L352 550 L352 553 L351 557 L350 560Z"/><path d="M397 560 L392 566 L386 571 L381 576 L377 581 L373 585 L372 591 L371 597 L370 604 L370 612 L367 620 L364 627 L358 634 L350 639 L340 642 L330 643 L320 642 L309 640 L300 636 L291 633 L284 629 L276 625 L269 622 L263 619 L256 617 L249 614 L243 610 L238 606 L233 601 L230 596 L227 591 L224 586 L221 581 L218 576 L214 571 L208 566 L202 560 L197 553 L192 546 L189 538 L188 530 L191 522 L196 516 L204 510 L214 507 L225 505 L236 504 L247 504 L256 504 L264 503 L272 502 L278 500 L285 498 L292 495 L300 492 L308 490 L317 489 L326 489 L334 491 L342 494 L349 497 L356 501 L362 505 L368 509 L375 513 L381 518 L388 522 L394 528 L398 534 L401 540 L402 547 L400 554 L397 560Z"/><path d="M441 560 L434 569 L427 577 L420 584 L414 591 L410 598 L408 606 L408 616 L407 627 L406 639 L403 651 L397 663 L388 673 L376 680 L361 685 L346 686 L330 684 L314 680 L300 674 L287 668 L276 662 L265 657 L255 652 L245 648 L234 644 L225 640 L215 635 L207 629 L200 622 L194 615 L189 607 L185 600 L181 592 L175 585 L169 577 L161 569 L153 560 L145 550 L138 539 L134 527 L134 515 L138 504 L146 494 L159 487 L174 481 L190 478 L206 477 L221 477 L235 477 L247 476 L258 474 L268 470 L278 466 L288 461 L300 456 L313 452 L326 451 L339 451 L352 454 L364 458 L375 464 L385 470 L394 477 L403 484 L412 490 L421 497 L430 504 L438 512 L444 521 L447 531 L448 541 L446 551 L441 560Z"/><path d="M483 560 L475 571 L466 582 L457 591 L451 601 L447 611 L445 622 L445 635 L445 650 L444 666 L439 683 L431 699 L419 712 L402 722 L382 728 L361 729 L340 726 L319 720 L300 712 L283 703 L268 695 L254 688 L240 682 L227 676 L213 671 L200 666 L187 660 L176 652 L166 643 L157 634 L151 624 L145 614 L139 604 L132 593 L123 583 L113 572 L103 560 L93 547 L85 532 L80 516 L81 501 L87 486 L99 474 L115 464 L135 457 L156 454 L177 452 L197 451 L215 450 L230 449 L243 445 L256 439 L270 432 L284 425 L300 418 L317 413 L336 410 L354 411 L371 415 L388 421 L402 429 L415 438 L427 448 L438 458 L449 467 L460 477 L471 487 L480 498 L487 509 L492 522 L492 535 L490 548 L483 560Z"/><path d="M524 560 L515 574 L504 587 L495 599 L488 611 L484 624 L483 638 L483 655 L484 674 L482 695 L477 716 L466 736 L450 752 L429 764 L404 771 L377 772 L349 767 L324 759 L300 749 L279 738 L260 727 L243 718 L226 711 L209 704 L192 699 L175 692 L158 685 L143 676 L130 666 L119 654 L110 641 L102 628 L94 615 L86 602 L76 589 L65 575 L53 560 L41 543 L33 525 L28 506 L30 487 L38 470 L53 455 L74 443 L99 435 L125 430 L150 428 L174 427 L195 425 L213 422 L229 416 L245 408 L261 398 L280 388 L300 378 L322 371 L346 368 L369 368 L392 373 L412 382 L430 393 L446 406 L460 419 L473 432 L486 445 L498 457 L510 470 L521 484 L529 498 L534 514 L535 529 L531 545 L524 560Z"/><path d="M564 560 L554 576 L543 592 L533 606 L526 621 L522 637 L521 655 L522 675 L523 699 L521 724 L514 749 L501 772 L481 792 L455 806 L424 813 L392 814 L359 808 L328 798 L300 785 L275 771 L253 759 L232 748 L212 739 L191 732 L170 726 L149 719 L129 711 L110 701 L93 689 L79 675 L67 660 L58 644 L48 628 L39 612 L28 596 L15 578 L2 560 L-9 540 L-18 518 L-22 496 L-19 474 L-8 454 L11 436 L36 423 L64 414 L95 408 L124 405 L152 403 L175 400 L196 395 L215 387 L233 376 L253 363 L275 349 L300 337 L327 328 L356 323 L385 324 L413 331 L437 342 L459 356 L478 372 L494 389 L508 406 L522 422 L535 438 L548 454 L560 470 L569 487 L575 506 L576 524 L572 542 L564 560Z"/><path d="M604 560 L593 579 L581 597 L571 614 L564 631 L561 650 L560 671 L562 696 L563 723 L560 753 L552 782 L536 809 L512 831 L481 847 L445 855 L406 854 L368 847 L332 834 L300 819 L271 803 L246 789 L221 777 L198 768 L174 761 L148 754 L123 748 L97 739 L74 727 L53 713 L36 697 L22 679 L10 660 L0 641 L-10 622 L-22 602 L-34 582 L-47 560 L-59 537 L-68 512 L-70 487 L-65 462 L-51 439 L-29 419 L-0 404 L32 394 L67 387 L100 383 L130 380 L157 376 L180 369 L201 358 L222 343 L244 326 L270 309 L300 293 L333 282 L367 277 L402 278 L434 287 L463 300 L488 318 L509 339 L527 359 L543 380 L558 400 L572 419 L586 438 L598 457 L608 477 L614 498 L615 519 L612 540 L604 560Z"/><path d="M644 560 L633 582 L621 602 L611 622 L604 642 L600 664 L601 689 L603 717 L603 748 L599 782 L589 815 L570 845 L542 870 L506 887 L464 894 L421 893 L377 884 L337 869 L300 852 L268 834 L238 818 L211 806 L184 797 L155 790 L126 784 L95 777 L65 768 L36 755 L11 739 L-9 721 L-26 699 L-39 677 L-50 654 L-61 632 L-72 609 L-85 585 L-97 560 L-108 534 L-115 506 L-116 477 L-108 450 L-92 425 L-66 403 L-34 387 L3 375 L41 368 L77 363 L110 358 L138 352 L163 342 L186 328 L209 309 L235 288 L265 267 L300 249 L338 235 L379 229 L419 231 L457 241 L490 258 L518 280 L541 305 L561 330 L577 355 L592 378 L607 401 L622 422 L635 444 L646 467 L653 490 L655 514 L652 537 L644 560Z"/></g></svg>
+    <div class="org" data-i18n="org"></div>
+    <h1 data-i18n="home_title"></h1>
+    <nav class="menu" aria-label="Main menu">
+      <a class="tile" href="field.html#find"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><b data-i18n="b_find"></b><span class="arr" aria-hidden="true">→</span></a>
+      <a class="tile" href="field.html#verify"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span><b data-i18n="b_field"></b><span class="arr" aria-hidden="true">→</span></a>
+      <a class="tile" href="#register"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M9 14h6M9 18h4"/></svg></span><b data-i18n="b_reg"></b><span class="arr" aria-hidden="true">→</span></a>
+      <a class="tile" href="#track"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span><b data-i18n="b_track"></b><span class="arr" aria-hidden="true">→</span></a>
+      <a class="tile" href="#info"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span><b data-i18n="b_info"></b><span class="arr" aria-hidden="true">→</span></a>
+      <a class="tile primary" href="dashboard.html"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2M10 21v-3h4v3"/></svg></span><b data-i18n="b_off"></b><span class="arr" aria-hidden="true">→</span></a>
+    </nav>
   </section>
 
   <div id="db-status" style="margin-top:14px"></div>
 
   <!-- ================= REGISTER GRIEVANCE ================= -->
-  <section class="card" id="register" style="margin-top:16px">
+  <section class="card view hidden" id="register" style="margin-top:16px">
+    <a class="back" href="#">← <span data-i18n="back"></span></a>
     <h2>📝 <span data-i18n="b_reg"></span></h2>
     <p class="muted">Fields marked <b>*</b> are required. This is a demo - please use made-up details only.</p>
     <form id="grv-form" novalidate>
@@ -69,7 +91,8 @@
   </section>
 
   <!-- ================= TRACK GRIEVANCE ================= -->
-  <section class="card" id="track">
+  <section class="card view hidden" id="track">
+    <a class="back" href="#">← <span data-i18n="back"></span></a>
     <h2>📊 <span data-i18n="b_track"></span></h2>
     <form id="trk-form" class="form-grid" novalidate>
       <div><label for="t-ref">Grievance reference number</label><input id="t-ref" placeholder="MCL-KA-GRV-2026-000125" autocomplete="off"></div>
@@ -82,7 +105,9 @@
   </section>
 
   <!-- ================= INFO ================= -->
-  <section class="grid grid-2">
+  <section class="view hidden" id="info">
+    <a class="back" href="#">← <span data-i18n="back"></span></a>
+    <div class="grid grid-2">
     <div class="card" id="about">
       <h2>About the system</h2>
       <p>MCL-LRMS brings acquisition records, maps, GIS locations, field verification and grievances into one place, so that acquired plots can be identified faster and every grievance is traceable.</p>
@@ -109,6 +134,7 @@
       <p>Help desk: <b>DEMO-HELPDESK</b> (sample - not a real number)</p>
       <p class="small muted">Never share your bank PIN or OTP with anyone. MCL officers will never ask for it.</p>
     </div>
+    </div>
   </section>
 </main>
 
@@ -121,9 +147,8 @@
   var L = LRMS, $ = L.$, esc = L.esc;
   L.addStrings({
     en: {
-      hero_title: "From acquisition records to identifiable plots - in one platform",
-      hero_text: "Acquisition records, GIS maps, field verification, physical possession tracking and transparent grievance redressal for the Land & Revenue Department, Kaniha Area.",
-      f1: "Records", f2: "Identifiable plots", f3: "Field verification", f4: "Possession tracking", f5: "Grievance redressal",
+      org: "Mahanadi Coalfields Limited · Kaniha Area", home_title: "Land & Revenue Portal",
+      b_info: "Notices & Help", back: "Back to menu",
       b_find: "Find Acquired Plot", b_find_s: "Village → Khata → Plot on the map",
       b_field: "Field Verification", b_field_s: "GPS, photos and boundary points (officers)",
       b_reg: "Register Grievance", b_reg_s: "Get a reference number instantly",
@@ -131,9 +156,8 @@
       b_off: "Officer Dashboard", b_off_s: "Authorised MCL officers only"
     },
     hi: {
-      hero_title: "अधिग्रहण अभिलेख से पहचान योग्य प्लॉट तक - एक ही प्लेटफ़ॉर्म पर",
-      hero_text: "भूमि एवं राजस्व विभाग, कनिहा क्षेत्र के लिए अधिग्रहण अभिलेख, जीआईएस मानचित्र, क्षेत्र सत्यापन, भौतिक कब्जा ट्रैकिंग और पारदर्शी शिकायत निवारण।",
-      f1: "अभिलेख", f2: "पहचान योग्य प्लॉट", f3: "क्षेत्र सत्यापन", f4: "कब्जा ट्रैकिंग", f5: "शिकायत निवारण",
+      org: "महानदी कोलफील्ड्स लिमिटेड · कनिहा क्षेत्र", home_title: "भूमि एवं राजस्व पोर्टल",
+      b_info: "सूचनाएँ व सहायता", back: "मेनू पर वापस",
       b_find: "अधिग्रहित प्लॉट खोजें", b_find_s: "गाँव → खाता → प्लॉट मानचित्र पर",
       b_field: "क्षेत्र सत्यापन", b_field_s: "जीपीएस, फोटो और सीमा बिंदु (अधिकारी)",
       b_reg: "शिकायत दर्ज करें", b_reg_s: "तुरंत संदर्भ संख्या प्राप्त करें",
@@ -142,6 +166,17 @@
     }
   });
   L.renderHeader("home");
+
+  // Simple page views: the home menu, or one section at a time
+  function route() {
+    var v = (location.hash || "").slice(1), ids = ["register", "track", "info"];
+    if (ids.indexOf(v) === -1) v = "view-home";
+    L.$all(".view").forEach(function (el) { el.classList.toggle("hidden", el.id !== v); });
+    document.body.classList.toggle("on-home", v === "view-home");
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", route);
+  route();
 
   if (!L.db) L.showMsg("#db-status", "warn", "The database is not connected yet, so grievances cannot be saved or tracked. The map and plot search still work with demo data.", L.dbError);
 
@@ -191,15 +226,17 @@
     })[0];
     var ai = L.suggestCategory(g.desc);
     var btn = $("#g-submit"); btn.disabled = true; btn.textContent = "Submitting...";
-    L.db.from(L.APP.table).insert({
-      record_type: "Grievance", location: g.village, urgency: ai.urgency, status: "Open",
-      khata_no: g.khata || null, plot_no: g.plot || null, plot_id: match ? match.id : null, updated_by: "Citizen",
+    L.db.rpc("register_grievance", { p: {
+      location: g.village, urgency: ai.urgency,
+      khata_no: g.khata || null, plot_no: g.plot || null, plot_id: match ? match.id : null,
       applicant_name: g.name, mobile: g.mobile, email: g.email || null, landowner_name: g.owner, category: g.cat,
       description: g.desc, language: g.lang, consent: true,
       attachments: fileNames($("#g-doc")).map(function (f) { f.kind = "Document"; return f; })
         .concat(fileNames($("#g-photo")).map(function (f) { f.kind = "Photograph"; return f; }))
-    }).select("ref_no, created_at").single().then(function (r) {
+    } }).then(function (r) {
       btn.disabled = false; btn.textContent = "Submit grievance";
+      if (!r.error) r.data = (r.data || [])[0];
+      if (!r.error && !r.data) r.error = "No reference number was returned.";
       if (r.error) { L.showMsg(msg, "err", "Sorry, the grievance could not be saved. Please try again.", r.error); return; }
       $("#grv-form").reset(); $("#ai-suggest").innerHTML = "";
       msg.innerHTML = "<div class='msg ok' role='status'><h3>✅ Your grievance has been successfully registered.</h3>" +
@@ -211,7 +248,7 @@
         "Acknowledgement by SMS/email will be sent once an authorised messaging service is connected.</p>" +
         "<button class='btn small' id='go-track'>Track this grievance</button></div>";
       $("#go-track").onclick = function () {
-        $("#t-ref").value = r.data.ref_no; $("#t-mobile").value = g.mobile; $("#track").scrollIntoView({ behavior: "smooth" });
+        $("#t-ref").value = r.data.ref_no; $("#t-mobile").value = g.mobile; location.hash = "track";
       };
       msg.scrollIntoView({ behavior: "smooth", block: "start" });
     });

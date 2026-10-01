@@ -115,3 +115,28 @@
   is simulated. Only file names are stored for uploads.
   Next step: Data Keeper runs database/01-setup.sql, fill in config.js, then
   test the live site using docs/DEMO-SCRIPT.md.
+- Phase 1b (builder: Claude, 1 Oct 2026): fixed config.js; new classy Home
+  page (title + 6 menu tiles; forms open as their own screens); officer area
+  LOCKED with real Supabase logins (team asked for this, replacing rule 6
+  "no login" for the officer area only). database/02-officer-login.sql: only
+  logged-in users can read grievances or change records; citizens register
+  via register_grievance(), track and file representations via functions.
+  Works: tested in a browser against a pretend database (wrong password
+  rejected; officer pages locked after sign-out). Known problems: roles are
+  still picked after login (not tied to the account); no OTP yet.
+  Next step: Data Keeper runs 02-officer-login.sql; create officer accounts in
+  Supabase (Authentication -> Users -> Add user); test on the live site.
+- Phase 1c (builder: Claude, 1 Oct 2026): space-industry style look on all
+  pages (black, condensed capitals, outlined buttons; full-screen Home hero
+  with contour lines). 8 fictional demo villages (Demopur, Sampleguda,
+  Testpali, Mockgarh, Dummypada, Pilotnagar, Trialpur, Modelguda - all
+  marked DEMO) with 22 fictional plots. Real village names were tried and
+  then removed at the team's request. Works: 19-step test
+  passes against a pretend database. Known problems: old test records on the
+  live database may use old plot ids.
+  Next step: merge, then test on the live site.
+- Phase 1d (builder: Claude, 1 Oct 2026): demo villages laid out around the
+  team's site point 21.079030, 85.041853 (Kaniha Area); the map is locked to
+  about 1 km around the villages (no panning away, no zooming out beyond the
+  site). Village positions and plots are still FICTIONAL. Next step: merge
+  PR 3, run 02-officer-login.sql, create officer accounts, test live.
