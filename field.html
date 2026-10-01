@@ -442,7 +442,7 @@
       { n: "?", d: "M350 172 L494 168 L500 298 L346 302 Z", c: 48 }
     ];
     var s = "<svg viewBox='0 0 540 380' xmlns='http://www.w3.org/2000/svg' font-family='serif'>" +
-      "<rect width='540' height='380' fill='#f3ecd9'/><text x='20' y='24' font-size='14' fill='#5a4a2a'>ACQUISITION MAP - SHEET 3 - Mouza Demopur (DEMO) - Scale 1:4000</text>";
+      "<rect width='540' height='380' fill='#f3ecd9'/><text x='20' y='24' font-size='14' fill='#5a4a2a'>ACQUISITION MAP - SHEET 3 - Mouza Kaniha - Scale 1:4000</text>";
     shapes.forEach(function (sh, i) {
       s += "<path d='" + sh.d + "' fill='none' stroke='#6b5a3a' stroke-width='1.6' stroke-dasharray='" + (i === 5 ? "3 4" : "0") + "'/>";
     });
@@ -592,7 +592,7 @@
   $("#ai-georef").onclick = function () {
     if (!map) return;
     layers.recon.clearLayers();
-    ["DP-150-240", "DP-145-234", "DP-145-235", "DP-121-124", "DP-121-125"].forEach(function (id) {
+    ["KN-150-240", "KN-145-234", "KN-145-235", "KN-121-124", "KN-121-125"].forEach(function (id) {
       var p = DEMO.plots.filter(function (x) { return x.id === id; })[0];
       L.polygon(p.polygon, { color: "#b061ff", weight: 3, dashArray: "6 4", fillOpacity: 0.05 })
         .bindTooltip("AI-reconstructed: Plot " + p.plot + " (" + p.confidence + "% technical confidence)").addTo(layers.recon);

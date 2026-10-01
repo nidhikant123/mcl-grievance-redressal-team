@@ -140,3 +140,7 @@
   about 1 km around the villages (no panning away, no zooming out beyond the
   site). Village positions and plots are still FICTIONAL. Next step: merge
   PR 3, run 02-officer-login.sql, create officer accounts, test live.
+- Phase 1e (builder: Claude, 1 Oct 2026): at the team's request the real
+  Kaniha Area village names are back: Kaniha, Telisingha, Jarada,
+  Patharmunda, Gundurinali, Badagunduri, Balrampur, Adaitaprasad. Plots,
+  owners, areas and village positions on the map remain FICTIONAL.

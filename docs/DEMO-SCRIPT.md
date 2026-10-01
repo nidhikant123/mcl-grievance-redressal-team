@@ -5,7 +5,7 @@ All data is fictional **DEMO DATA**. Use a phone for steps 7-9 to show GPS and c
 | Step | Where | What to click / say |
 |---|---|---|
 | 1 | `dashboard.html` | Sign in with an officer email and password (created in Supabase → Authentication → Users). Pick the working role **DEMO-LRO-01 - Land & Revenue Officer**, then **Open dashboard**. Say: "Production adds an OTP step." |
-| 2 | Menu → **Find Plot & Field** | Village **Demopur (DEMO)** → Khata **145** → Plot **234**, then **Locate Plot**. |
+| 2 | Menu → **Find Plot & Field** | Village **Kaniha** → Khata **145** → Plot **234**, then **Locate Plot**. |
 | 3 | same | The plot record appears with the map zoomed in. Point out the **AI discrepancy check**: 0.82 vs 0.81 acre, and the name variation. |
 | 4 | Tab **AI Document Analysis** | Click **Try the sample old map (DEMO)**. You can also upload any scanned image to show real OCR. |
 | 5 | same | Show the extracted village, khata, plot, area and notification. Point out "124/356 vs 124". **Detect plot boundaries (AI)** shows the High/Medium/Low confidence. |
@@ -15,7 +15,7 @@ All data is fictional **DEMO DATA**. Use a phone for steps 7-9 to show GPS and c
 | 9 | same | Choose the result **Blue**, write remarks, then **Submit verification**. |
 | 10 | same | The plot turns Blue on the map. The previous status stays in the plot history. |
 | 11 | same | **Field verification / possession report**, then Save as PDF. |
-| 12 | Menu → **Home** | **Register Grievance**: village Demopur (DEMO), khata 145, plot 234, a made-up name and mobile (e.g. 9000000001), and a description about demarcation. |
+| 12 | Menu → **Home** | **Register Grievance**: village Kaniha, khata 145, plot 234, a made-up name and mobile (e.g. 9000000001), and a description about demarcation. |
 | 13 | same | The reference number appears, e.g. **MCL-KA-GRV-2026-000125**. |
 | 14 | `dashboard.html` as **DEMO-GO-01** | The notification bell shows "New grievance received". Open it from the list. |
 | 15 | Grievance window | **Schedule field verification**, then assign to DEMO-FVO-01. |
