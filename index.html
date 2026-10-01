@@ -69,30 +69,30 @@
   <section class="card view hidden" id="register" style="margin-top:16px">
     <a class="back" href="#">← <span data-i18n="back"></span></a>
     <h2>📝 <span data-i18n="b_reg"></span></h2>
-    <p class="muted">Fields marked <b>*</b> are required. This is a demo - please use made-up details only.</p>
+    <p class="muted">Only fields marked <b>*</b> are required. Everything else, including photos and documents, is optional. This is a demo - please use made-up details only.</p>
     <form id="grv-form" novalidate>
       <div class="form-grid">
         <div><label for="g-name">Applicant name *</label><input id="g-name" maxlength="80" autocomplete="off" required></div>
-        <div><label for="g-mobile">Mobile number * <span class="opt">(10 digits)</span></label><input id="g-mobile" inputmode="numeric" maxlength="10" autocomplete="off" required></div>
+        <div><label for="g-mobile">Mobile number * <span class="opt">(10 digits, starting with 6, 7, 8 or 9)</span></label><input id="g-mobile" inputmode="numeric" maxlength="10" autocomplete="off" required></div>
         <div><label for="g-email">Email <span class="opt">(optional)</span></label><input id="g-email" type="email" maxlength="80" autocomplete="off"></div>
         <div><label for="g-village">Village *</label><select id="g-village" required></select></div>
         <div><label for="g-khata">Khata number <span class="opt">(optional)</span></label><input id="g-khata" maxlength="20"></div>
         <div><label for="g-plot">Plot number <span class="opt">(optional)</span></label><input id="g-plot" maxlength="20"></div>
         <div><label for="g-owner">Landowner / affected person name *</label><input id="g-owner" maxlength="80" required></div>
         <div><label for="g-cat">Type of grievance *</label><select id="g-cat" required></select></div>
-        <div><label for="g-lang">Preferred communication language</label>
+        <div><label for="g-lang">Preferred communication language <span class="opt">(optional)</span></label>
           <select id="g-lang"><option>English</option><option>Hindi</option><option>Odia</option></select></div>
       </div>
       <label for="g-desc">Description of grievance * <span class="opt">(at least 20 characters)</span></label>
       <textarea id="g-desc" maxlength="2000" required></textarea>
       <div id="ai-suggest" class="hint"></div>
       <div class="form-grid">
-        <div><label for="g-doc">Relevant document <span class="opt">(optional, PDF/image)</span></label><input id="g-doc" type="file" accept=".pdf,image/*" multiple></div>
-        <div><label for="g-photo">Photograph <span class="opt">(optional)</span></label><input id="g-photo" type="file" accept="image/*" capture="environment" multiple></div>
+        <div><label for="g-doc">Relevant document <span class="opt">(optional - PDF or image)</span></label><input id="g-doc" type="file" accept=".pdf,image/*" multiple></div>
+        <div><label for="g-photo">Photograph <span class="opt">(optional)</span></label><input id="g-photo" type="file" accept="image/*" multiple></div>
       </div>
       <p class="hint">Demo note: only the file names are recorded. Secure document storage is part of the production design.</p>
       <label class="check" style="margin-top:14px"><input type="checkbox" id="g-consent">
-        <span>I declare that the information given is true to the best of my knowledge, and I consent to MCL using it to examine my grievance.</span></label>
+        <span><b>*</b> I declare that the information given is true to the best of my knowledge, and I consent to MCL using it to examine my grievance.</span></label>
       <div class="btn-row"><button class="btn accent" type="submit" id="g-submit">Submit grievance</button></div>
     </form>
     <div id="grv-msg"></div>
@@ -218,16 +218,23 @@
       village: vSel.value, khata: $("#g-khata").value.trim(), plot: $("#g-plot").value.trim(), owner: $("#g-owner").value.trim(),
       cat: $("#g-cat").value, desc: desc.value.trim(), lang: $("#g-lang").value
     };
+    // Only the * fields are checked; photos and documents are never required
     var problems = [];
-    if (!g.name) problems.push("applicant name");
-    if (!/^[6-9]\d{9}$/.test(g.mobile)) problems.push("a valid 10-digit mobile number");
-    if (g.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(g.email)) problems.push("a valid email (or leave it empty)");
-    if (!g.village) problems.push("village");
-    if (!g.owner) problems.push("landowner / affected person name");
-    if (!g.cat) problems.push("type of grievance");
-    if (g.desc.length < 20) problems.push("a description of at least 20 characters");
-    if (!$("#g-consent").checked) problems.push("the declaration tick-box");
-    if (problems.length) { L.showMsg(msg, "err", "Please fill in: " + problems.join(", ") + "."); return; }
+    L.$all("#grv-form .invalid").forEach(function (el) { el.classList.remove("invalid"); });
+    function need(ok, id, text) { if (!ok) { problems.push(text); $("#" + id).classList.add("invalid"); } }
+    need(!!g.name, "g-name", "applicant name");
+    need(/^[6-9]\d{9}$/.test(g.mobile), "g-mobile", "a 10-digit mobile number starting with 6, 7, 8 or 9");
+    need(!g.email || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(g.email), "g-email", "a valid email (or leave it empty)");
+    need(!!g.village, "g-village", "village");
+    need(!!g.owner, "g-owner", "landowner / affected person name");
+    need(!!g.cat, "g-cat", "type of grievance");
+    need(g.desc.length >= 20, "g-desc", "a description of at least 20 characters");
+    need($("#g-consent").checked, "g-consent", "the declaration tick-box");
+    if (problems.length) {
+      L.showMsg(msg, "err", "Please complete the fields marked * (shown in red): " + problems.join(", ") + ". Photos and documents are optional.");
+      var first = $("#grv-form .invalid"); if (first) first.focus();
+      return;
+    }
     if (!L.dbReady(msg)) return;
 
     var match = DEMO.plots.filter(function (p) {
