@@ -121,11 +121,19 @@ var LRMS = (function () {
     { id: "DEMO-RO-01",  role: "RO",  name: "Demo Senior Officer (read-only)" }
   ];
   var SESSION_KEY = "lrms_demo_officer", TIMEOUT_MIN = 15;
+  // Real login: officer accounts are Supabase users (email + password).
+  // The database only lets logged-in users read grievances or change records.
+  var authUser = null;
+  var ready = !db ? Promise.resolve() : db.auth.getSession().then(function (r) {
+    authUser = r && r.data && r.data.session ? r.data.session.user : null;
+  }).catch(function () { authUser = null; });
+  function clearRole() { try { sessionStorage.removeItem(SESSION_KEY); } catch (e) { /* ignore */ } }
   function officer() {
+    if (!authUser) return null;
     try {
       var s = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null");
-      if (!s) return null;
-      if (Date.now() - s.last > TIMEOUT_MIN * 60000) { sessionStorage.removeItem(SESSION_KEY); return null; }
+      if (!s || s.email !== authUser.email) return null;
+      if (Date.now() - s.last > TIMEOUT_MIN * 60000) { clearRole(); if (db) db.auth.signOut(); authUser = null; return null; }
       return s;
     } catch (e) { return null; }
   }
@@ -135,14 +143,25 @@ var LRMS = (function () {
       s.last = Date.now(); sessionStorage.setItem(SESSION_KEY, JSON.stringify(s));
     } catch (e) { /* ignore */ }
   }
+  function login(email, password) {
+    if (!db) return Promise.resolve({ error: dbError });
+    return db.auth.signInWithPassword({ email: email, password: password }).then(function (r) {
+      if (!r.error && r.data) authUser = r.data.user;
+      return r;
+    });
+  }
+  // After login the officer picks a working role (role checks are still demo-level)
   function signIn(id) {
     var o = OFFICERS.filter(function (x) { return x.id === id; })[0];
-    if (!o) return null;
-    var s = { id: o.id, name: o.name, role: o.role, roleName: ROLES[o.role].name, last: Date.now() };
+    if (!o || !authUser) return null;
+    var s = { id: o.id, name: o.name, role: o.role, roleName: ROLES[o.role].name, email: authUser.email, last: Date.now() };
     try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch (e) { /* ignore */ }
     return s;
   }
-  function signOut() { try { sessionStorage.removeItem(SESSION_KEY); } catch (e) { /* ignore */ } location.reload(); }
+  function signOut() {
+    clearRole();
+    (db ? db.auth.signOut() : Promise.resolve()).then(function () { location.reload(); }, function () { location.reload(); });
+  }
   function can(perm) { var s = officer(); return !!(s && ROLES[s.role].perms.indexOf(perm) !== -1); }
   function histEntry(action, oldS, newS, extra) {
     var s = officer();
@@ -190,16 +209,17 @@ var LRMS = (function () {
       try { localStorage.setItem("lrms_lang", lang() === "hi" ? "en" : "hi"); } catch (e) { /* ignore */ }
       location.reload();
     });
-    var s = officer();
-    if (s) {
+    ready.then(function () {
+      var s = officer();
+      if (!s) return;
       var strip = $("#officer-strip"); strip.classList.remove("hidden");
-      $(".bar", strip).innerHTML = "<span>🔐 Signed in (demo): <b>" + esc(s.id) + "</b> - " + esc(s.roleName) + "</span>" +
+      $(".bar", strip).innerHTML = "<span>🔐 Signed in: <b>" + esc(s.id) + "</b> - " + esc(s.roleName) + " <span class='muted small'>(" + esc(s.email) + ")</span></span>" +
         "<span class='muted small'>Auto sign-out after " + TIMEOUT_MIN + " min of inactivity</span>" +
         "<button class='btn small secondary' id='signout-btn' style='margin-left:auto'>Sign out</button>";
       $("#signout-btn").addEventListener("click", signOut);
       ["click", "keydown", "touchstart"].forEach(function (ev) { document.addEventListener(ev, touch, { passive: true }); });
-      setInterval(function () { if (!officer()) location.reload(); }, 30000);
-    }
+      setInterval(function () { if (!officer()) signOut(); }, 30000);
+    });
     var f = document.createElement("footer"); f.className = "site-footer";
     f.innerHTML = "<p><b>" + esc(APP.name) + "</b> - an AI-assisted decision-support, GIS mapping, land-record management and grievance-tracking platform. " +
       "It does not declare ownership, decide title, determine lawful possession or alter official land records. Final decisions remain with competent authorities.</p>" +
@@ -320,7 +340,8 @@ var LRMS = (function () {
     errText: errText, showMsg: showMsg, dbReady: dbReady, norm: norm, normPlot: normPlot, download: download, toCSV: toCSV,
     printReport: printReport, STAGES: STAGES, CATEGORIES: CATEGORIES, PLOT_STATUS: PLOT_STATUS, STATUS_HEX: STATUS_HEX,
     statusPill: statusPill, stagePill: stagePill, stageToStatus: stageToStatus, ROLES: ROLES, OFFICERS: OFFICERS,
-    officer: officer, signIn: signIn, signOut: signOut, can: can, histEntry: histEntry, t: t, lang: lang,
+    officer: officer, signIn: signIn, signOut: signOut, login: login, ready: ready,
+    authUser: function () { return authUser; }, can: can, histEntry: histEntry, t: t, lang: lang,
     addStrings: addStrings, applyI18n: applyI18n, renderHeader: renderHeader, loadRecords: loadRecords,
     mergePlotUpdates: mergePlotUpdates, similarity: similarity, detectDiscrepancies: detectDiscrepancies,
     suggestCategory: suggestCategory, areaSqm: areaSqm, sqmToAcre: sqmToAcre, distM: distM, centroid: centroid

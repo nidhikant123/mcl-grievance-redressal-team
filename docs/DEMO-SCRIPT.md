@@ -4,13 +4,13 @@ All data is fictional **DEMO DATA**. Use a phone for steps 7-9 to show GPS and c
 
 | Step | Where | What to click / say |
 |---|---|---|
-| 1 | `dashboard.html` | Pick **DEMO-LRO-01 - Land & Revenue Officer**, then **Sign in (demo)**. Say: "In production this is Officer ID → PIN → OTP." |
+| 1 | `dashboard.html` | Sign in with an officer email and password (created in Supabase → Authentication → Users). Pick the working role **DEMO-LRO-01 - Land & Revenue Officer**, then **Open dashboard**. Say: "Production adds an OTP step." |
 | 2 | Menu → **Find Plot & Field** | Village **Demopur (DEMO)** → Khata **145** → Plot **234**, then **Locate Plot**. |
 | 3 | same | The plot record appears with the map zoomed in. Point out the **AI discrepancy check**: 0.82 vs 0.81 acre, and the name variation. |
 | 4 | Tab **AI Document Analysis** | Click **Try the sample old map (DEMO)**. You can also upload any scanned image to show real OCR. |
 | 5 | same | Show the extracted village, khata, plot, area and notification. Point out "124/356 vs 124". **Detect plot boundaries (AI)** shows the High/Medium/Low confidence. |
 | 6 | same | **Georeference & show on GIS map**: purple dashed outlines appear on the satellite layer. Tick "I have reviewed" and save. |
-| 7 | Sign out, then sign in as **DEMO-FVO-01** | Tab **Field Verification**. Choose Plot 234, then **Start Field Verification**. |
+| 7 | Sign out, sign in again and pick the role **DEMO-FVO-01** | Tab **Field Verification**. Choose Plot 234, then **Start Field Verification**. |
 | 8 | same | **Capture my GPS location**, or use the simulated GPS indoors. Mark 4 boundary points; the polygon and its area appear. Take a photo: it is stamped with GPS, time, plot and officer. |
 | 9 | same | Choose the result **Blue**, write remarks, then **Submit verification**. |
 | 10 | same | The plot turns Blue on the map. The previous status stays in the plot history. |

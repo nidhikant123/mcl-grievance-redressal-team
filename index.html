@@ -221,15 +221,17 @@
     })[0];
     var ai = L.suggestCategory(g.desc);
     var btn = $("#g-submit"); btn.disabled = true; btn.textContent = "Submitting...";
-    L.db.from(L.APP.table).insert({
-      record_type: "Grievance", location: g.village, urgency: ai.urgency, status: "Open",
-      khata_no: g.khata || null, plot_no: g.plot || null, plot_id: match ? match.id : null, updated_by: "Citizen",
+    L.db.rpc("register_grievance", { p: {
+      location: g.village, urgency: ai.urgency,
+      khata_no: g.khata || null, plot_no: g.plot || null, plot_id: match ? match.id : null,
       applicant_name: g.name, mobile: g.mobile, email: g.email || null, landowner_name: g.owner, category: g.cat,
       description: g.desc, language: g.lang, consent: true,
       attachments: fileNames($("#g-doc")).map(function (f) { f.kind = "Document"; return f; })
         .concat(fileNames($("#g-photo")).map(function (f) { f.kind = "Photograph"; return f; }))
-    }).select("ref_no, created_at").single().then(function (r) {
+    } }).then(function (r) {
       btn.disabled = false; btn.textContent = "Submit grievance";
+      if (!r.error) r.data = (r.data || [])[0];
+      if (!r.error && !r.data) r.error = "No reference number was returned.";
       if (r.error) { L.showMsg(msg, "err", "Sorry, the grievance could not be saved. Please try again.", r.error); return; }
       $("#grv-form").reset(); $("#ai-suggest").innerHTML = "";
       msg.innerHTML = "<div class='msg ok' role='status'><h3>✅ Your grievance has been successfully registered.</h3>" +

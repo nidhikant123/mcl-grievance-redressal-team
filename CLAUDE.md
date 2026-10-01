@@ -115,3 +115,14 @@
   is simulated. Only file names are stored for uploads.
   Next step: Data Keeper runs database/01-setup.sql, fill in config.js, then
   test the live site using docs/DEMO-SCRIPT.md.
+- Phase 1b (builder: Claude, 1 Oct 2026): fixed config.js; new classy Home
+  page (title + 6 menu tiles; forms open as their own screens); officer area
+  LOCKED with real Supabase logins (team asked for this, replacing rule 6
+  "no login" for the officer area only). database/02-officer-login.sql: only
+  logged-in users can read grievances or change records; citizens register
+  via register_grievance(), track and file representations via functions.
+  Works: tested in a browser against a pretend database (wrong password
+  rejected; officer pages locked after sign-out). Known problems: roles are
+  still picked after login (not tied to the account); no OTP yet.
+  Next step: Data Keeper runs 02-officer-login.sql; create officer accounts in
+  Supabase (Authentication -> Users -> Add user); test on the live site.

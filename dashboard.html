@@ -23,16 +23,26 @@
 <main>
   <div id="page-msg"></div>
 
-  <!-- ================= SIGN IN (DEMO) ================= -->
+  <!-- ================= SIGN IN ================= -->
   <section id="signin" class="card signin hidden">
-    <h1>🏢 Officer Dashboard</h1>
-    <p>For authorised MCL officers only.</p>
-    <div class="msg warn"><b>Demo sign-in - not real security.</b> This prototype has no login server, so you pick a demo officer role below.
-      The production system uses <b>Officer ID → individual PIN (stored hashed, lock-out after repeated failures) → OTP</b> on a secure backend.
-      No PIN or password is stored in this website's code.</div>
-    <label for="si-officer">Demo officer</label>
-    <select id="si-officer"></select>
-    <div class="btn-row"><button class="btn accent" id="si-btn" style="flex:1">Sign in (demo)</button></div>
+    <h1>🔐 Officer sign-in</h1>
+    <p class="muted">For authorised MCL officers only.</p>
+    <form id="si-login" novalidate>
+      <label for="si-email">Officer email</label>
+      <input id="si-email" type="email" autocomplete="username" required>
+      <label for="si-pw">Password</label>
+      <input id="si-pw" type="password" autocomplete="current-password" required>
+      <div class="btn-row"><button class="btn accent" type="submit" id="si-login-btn" style="flex:1">Sign in</button></div>
+    </form>
+    <div id="si-role" class="hidden">
+      <p>Signed in as <b id="si-who"></b>.</p>
+      <label for="si-officer">Working role <span class="opt">(demo roles)</span></label>
+      <select id="si-officer"></select>
+      <div class="btn-row"><button class="btn accent" id="si-btn" style="flex:1">Open dashboard</button>
+        <button class="btn secondary" id="si-out">Sign out</button></div>
+    </div>
+    <div id="si-msg"></div>
+    <p class="hint">Officer accounts are created by the administrator in Supabase. Production adds an OTP step.</p>
   </section>
 
   <!-- ================= DASHBOARD ================= -->
@@ -96,6 +106,8 @@
 (function () {
   var L = LRMS, $ = L.$, $all = L.$all, esc = L.esc;
   L.renderHeader("dash");
+  L.ready.then(start);
+  function start() {
   var me = L.officer();
 
   // ================= SIGN IN =================
@@ -103,7 +115,25 @@
     $("#signin").classList.remove("hidden");
     $("#si-officer").innerHTML = L.OFFICERS.map(function (o) {
       return "<option value='" + esc(o.id) + "'>" + esc(o.id) + " - " + esc(L.ROLES[o.role].name) + "</option>"; }).join("");
+    var showRole = function () {
+      $("#si-login").classList.add("hidden"); $("#si-role").classList.remove("hidden");
+      $("#si-who").textContent = L.authUser().email;
+    };
+    if (L.authUser()) showRole();
+    if (!L.db) L.showMsg("#si-msg", "err", "Sign-in is not possible because the database is not connected.", L.dbError);
+    $("#si-login").onsubmit = function (e) {
+      e.preventDefault();
+      var em = $("#si-email").value.trim(), pw = $("#si-pw").value;
+      if (!em || !pw) { L.showMsg("#si-msg", "err", "Please enter your email and password."); return; }
+      var btn = $("#si-login-btn"); btn.disabled = true; btn.textContent = "Signing in...";
+      L.login(em, pw).then(function (r) {
+        btn.disabled = false; btn.textContent = "Sign in";
+        if (r.error) { L.showMsg("#si-msg", "err", "Sign-in failed. Check the email and password.", r.error); return; }
+        $("#si-msg").innerHTML = ""; showRole();
+      });
+    };
     $("#si-btn").onclick = function () { L.signIn($("#si-officer").value); location.reload(); };
+    $("#si-out").onclick = L.signOut;
     return;
   }
   $("#dash").classList.remove("hidden");
@@ -541,6 +571,7 @@
   });
 
   load();
+  }
 })();
 </script>
 </body>

@@ -802,14 +802,18 @@
   $("#m-fit").onclick = fitAll;
 
   window.FIELD = { select: select };
-  initMap(); fitAll(); lockCards();
+  initMap(); fitAll();
   var tab = (location.hash || "#find").slice(1);
   showTab(["find", "ai", "verify"].indexOf(tab) !== -1 ? tab : "find");
-  refresh().then(function () {
-    var pid = params.get("plot");
-    if (pid && byId(pid)) { select(pid); if (tab === "verify" && $("#v-plot")) { $("#v-plot").value = pid; showTab("verify"); } }
+  // Officer tools appear only after the login check has finished
+  L0.ready.then(function () {
+    lockCards();
+    refresh().then(function () {
+      var pid = params.get("plot");
+      if (pid && byId(pid)) { select(pid); if (tab === "verify" && $("#v-plot")) { $("#v-plot").value = pid; showTab("verify"); } }
+    });
+    loadGrievances();
   });
-  loadGrievances();
 })();
 </script>
 </body>
