@@ -5,11 +5,17 @@
 var DEMO = (function () {
   var TAHASIL = "Kaniha", DISTRICT = "Angul";
   // Synthetic grid origin (not a surveyed location)
-  var ORIGIN = {
-    "Demopur (DEMO)": [21.0950, 85.1050], "Sampleguda (DEMO)": [21.0905, 85.1135], "Testpali (DEMO)": [21.0905, 85.1060],
-    "Mockgarh (DEMO)": [21.0990, 85.1120], "Dummypada (DEMO)": [21.0860, 85.1050], "Pilotnagar (DEMO)": [21.0860, 85.1140],
-    "Trialpur (DEMO)": [21.1000, 85.1030], "Modelguda (DEMO)": [21.0950, 85.1200]
+  // Site reference point given by the team (Kaniha Area). The demo villages are laid
+  // out around it on a synthetic grid; their positions are NOT real village locations.
+  var SITE = [21.079030, 85.041853];
+  // Offsets (degrees) of each demo village's grid corner from the site point
+  var OFFSET = {
+    "Demopur (DEMO)": [0.0028, -0.0073], "Sampleguda (DEMO)": [-0.0017, 0.0012], "Testpali (DEMO)": [-0.0017, -0.0063],
+    "Mockgarh (DEMO)": [0.0068, -0.0003], "Dummypada (DEMO)": [-0.0062, -0.0073], "Pilotnagar (DEMO)": [-0.0062, 0.0017],
+    "Trialpur (DEMO)": [0.0078, -0.0093], "Modelguda (DEMO)": [0.0028, 0.0077]
   };
+  var ORIGIN = {};
+  Object.keys(OFFSET).forEach(function (v) { ORIGIN[v] = [SITE[0] + OFFSET[v][0], SITE[1] + OFFSET[v][1]]; });
   var CELL_LAT = 0.00052, CELL_LNG = 0.00056; // about 58 m x 58 m (~0.83 acre)
 
   // Deterministic small jitter so plots look hand-drawn rather than a perfect grid
@@ -169,6 +175,12 @@ var DEMO = (function () {
     "Recorded tenant: DEMO Owner Alpha\n" +
     "Scale 1:4000   Land acquired for Coal Block (DEMO)";
 
-  return { plots: plots, villages: villages, mclLand: mclLand, landmarks: landmarks, controlPoints: controlPoints,
+  // The map may only show this area: all villages plus about 1 km around them
+  var allPts = [SITE]; villages.forEach(function (v) { allPts = allPts.concat(v.boundary); });
+  var lats = allPts.map(function (x) { return x[0]; }), lngs = allPts.map(function (x) { return x[1]; });
+  var siteBounds = [[Math.min.apply(null, lats) - 0.009, Math.min.apply(null, lngs) - 0.009],
+                    [Math.max.apply(null, lats) + 0.009, Math.max.apply(null, lngs) + 0.009]];
+
+  return { site: SITE, siteBounds: siteBounds, plots: plots, villages: villages, mclLand: mclLand, landmarks: landmarks, controlPoints: controlPoints,
            sampleOcrText: sampleOcrText, CELL_LAT: CELL_LAT, CELL_LNG: CELL_LNG };
 })();

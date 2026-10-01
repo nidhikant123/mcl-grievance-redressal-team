@@ -135,3 +135,8 @@
   passes against a pretend database. Known problems: old test records on the
   live database may use old plot ids.
   Next step: merge, then test on the live site.
+- Phase 1d (builder: Claude, 1 Oct 2026): demo villages laid out around the
+  team's site point 21.079030, 85.041853 (Kaniha Area); the map is locked to
+  about 1 km around the villages (no panning away, no zooming out beyond the
+  site). Village positions and plots are still FICTIONAL. Next step: merge
+  PR 3, run 02-officer-login.sql, create officer accounts, test live.
