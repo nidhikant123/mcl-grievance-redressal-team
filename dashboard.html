@@ -208,7 +208,7 @@
       $all(".chart-box").forEach(function (el) { el.innerHTML = "<p class='small muted'>Charts could not load (Chart.js not available). The numbers above are still correct.</p>"; });
       return;
     }
-    var dark = true, ink = "#c8cbd0", grid = "#1f2226";
+    var dark = true, ink = "#b9d3ea", grid = "#1a4266";
     Chart.defaults.color = ink; Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
     var stageCounts = L.STAGES.map(function (s) { return gs.filter(function (g) { return g.stage === s; }).length; });
     var st = Object.keys(L.PLOT_STATUS), plotCounts = st.map(function (s) { return ps.filter(function (p) { return p.status === s; }).length; });
@@ -217,7 +217,7 @@
       scales: { x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: grid } }, y: { grid: { display: false } } } };
     if (charts.stage) charts.stage.destroy();
     charts.stage = new Chart($("#ch-stage"), { type: "bar", options: base, data: { labels: L.STAGES.map(function (x) { return x.replace("Field Verification Required", "Field Verif. Reqd."); }),
-      datasets: [{ data: stageCounts, backgroundColor: "#d7dadf", borderRadius: 4, maxBarThickness: 26 }] } });
+      datasets: [{ data: stageCounts, backgroundColor: "#5cc8ff", borderRadius: 4, maxBarThickness: 26 }] } });
     if (charts.plot) charts.plot.destroy();
     charts.plot = new Chart($("#ch-plot"), { type: "bar", data: {
       labels: st,

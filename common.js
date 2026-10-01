@@ -170,6 +170,22 @@ var LRMS = (function () {
     return h;
   }
 
+  // ---------- Emblem: coal as the "black diamond" ----------
+  function gem(cls) {
+    var e = "stroke='#7fd6ff' stroke-width='1.6' stroke-linejoin='round'";
+    return "<svg class='" + (cls || "") + "' viewBox='0 0 200 180' role='img' aria-label='Coal - the black diamond'>" +
+      "<polygon points='30,50 65,15 75,50' fill='#2b3642' " + e + "/>" +
+      "<polygon points='65,15 100,15 75,50' fill='#1b232c' " + e + "/>" +
+      "<polygon points='100,15 75,50 125,50' fill='#323f4d' " + e + "/>" +
+      "<polygon points='100,15 135,15 125,50' fill='#1b232c' " + e + "/>" +
+      "<polygon points='135,15 170,50 125,50' fill='#141a21' " + e + "/>" +
+      "<polygon points='30,50 75,50 100,165' fill='#0f141a' " + e + "/>" +
+      "<polygon points='75,50 125,50 100,165' fill='#19212a' " + e + "/>" +
+      "<polygon points='125,50 170,50 100,165' fill='#0a0e12' " + e + "/>" +
+      "<path d='M150 4 L153 13 L162 16 L153 19 L150 28 L147 19 L138 16 L147 13 Z' fill='#e6f7ff'/>" +
+      "</svg>";
+  }
+
   // ---------- Header + menu (identical on every page) ----------
   var I18N = {
     en: {
@@ -194,7 +210,7 @@ var LRMS = (function () {
     var head = document.createElement("div");
     head.innerHTML =
       "<header class='site-header'><div class='bar'>" +
-      "<a class='brand' href='index.html'><div class='logo'>MCL</div><div><b>" + APP.short + "</b><span data-i18n='tagline'></span></div></a>" +
+      "<a class='brand' href='index.html'><div class='logo'>" + gem() + "</div><div><b>" + APP.short + "</b><span data-i18n='tagline'></span></div></a>" +
       "<nav class='site-nav' aria-label='Main menu'>" +
       "<a href='index.html' data-page='home' data-i18n='nav_home'></a>" +
       "<a href='field.html' data-page='field' data-i18n='nav_field'></a>" +
@@ -340,7 +356,7 @@ var LRMS = (function () {
     errText: errText, showMsg: showMsg, dbReady: dbReady, norm: norm, normPlot: normPlot, download: download, toCSV: toCSV,
     printReport: printReport, STAGES: STAGES, CATEGORIES: CATEGORIES, PLOT_STATUS: PLOT_STATUS, STATUS_HEX: STATUS_HEX,
     statusPill: statusPill, stagePill: stagePill, stageToStatus: stageToStatus, ROLES: ROLES, OFFICERS: OFFICERS,
-    officer: officer, signIn: signIn, signOut: signOut, login: login, ready: ready,
+    gem: gem, officer: officer, signIn: signIn, signOut: signOut, login: login, ready: ready,
     authUser: function () { return authUser; }, can: can, histEntry: histEntry, t: t, lang: lang,
     addStrings: addStrings, applyI18n: applyI18n, renderHeader: renderHeader, loadRecords: loadRecords,
     mergePlotUpdates: mergePlotUpdates, similarity: similarity, detectDiscrepancies: detectDiscrepancies,
