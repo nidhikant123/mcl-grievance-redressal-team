@@ -144,3 +144,7 @@
   Kaniha Area village names are back: Kaniha, Telisingha, Jarada,
   Patharmunda, Gundurinali, Badagunduri, Balrampur, Adaitaprasad. Plots,
   owners, areas and village positions on the map remain FICTIONAL.
+- Phase 1f (builder: Claude, 1 Oct 2026): colours changed from black to
+  ocean and sky blue on all pages; coal shown as a "black diamond" emblem
+  (header logo and large on the Home page, caption "Coal · The Black
+  Diamond"). Works: 19-step test passes. Next step: merge, test live.
