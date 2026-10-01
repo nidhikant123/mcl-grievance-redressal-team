@@ -148,3 +148,8 @@
   ocean and sky blue on all pages; coal shown as a "black diamond" emblem
   (header logo and large on the Home page, caption "Coal · The Black
   Diamond"). Works: 19-step test passes. Next step: merge, test live.
+- Phase 1g (builder: Claude, 1 Oct 2026): grievance form - only * fields are
+  required (declaration now shows *); photos/documents clearly optional;
+  missing * fields turn red; photo upload can also pick from the gallery.
+  Reminder: grievance submit needs database/01-setup.sql AND
+  02-officer-login.sql run in Supabase.

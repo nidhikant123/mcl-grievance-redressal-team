@@ -286,3 +286,5 @@ th { background: #0c2d4c; text-transform: uppercase; letter-spacing: .06em; font
 .card, .kpi { background: linear-gradient(180deg, #0c2a48 0%, #0a2540 100%); }
 .kpi .v { color: var(--sky-2); }
 a { color: var(--sky-2); }
+.invalid { border-color: var(--err) !important; box-shadow: 0 0 0 3px rgba(255, 122, 112, .25) !important; }
+input[type="checkbox"].invalid { outline: 3px solid var(--err); }
