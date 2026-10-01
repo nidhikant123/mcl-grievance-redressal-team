@@ -126,3 +126,12 @@
   still picked after login (not tied to the account); no OTP yet.
   Next step: Data Keeper runs 02-officer-login.sql; create officer accounts in
   Supabase (Authentication -> Users -> Add user); test on the live site.
+- Phase 1c (builder: Claude, 1 Oct 2026): space-industry style look on all
+  pages (black, condensed capitals, outlined buttons; full-screen Home hero
+  with contour lines). Villages renamed, at the team's request, to real
+  villages of Kaniha Area: Kaniha, Telisingha, Jarada, Patharmunda,
+  Gundurinali, Badagunduri, Balrampur, Adaitaprasad (22 plots). Plot data,
+  owners, areas and map positions remain FICTIONAL. Works: 19-step test
+  passes against a pretend database. Known problems: old test records on the
+  live database still use the old village names (Demopur / Sampleguda).
+  Next step: merge, then test on the live site.
